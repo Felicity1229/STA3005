@@ -10,7 +10,7 @@ Authors@R:
     )
 Maintainer: Yibing Zhang <123090837@link.cuhk.edu.cn>
 Description: A comprehensive and user-friendly R package designed for analyzing and predicting water potability. 
-    aquaGuard provides an end-to-end data science pipeline, integrating data preprocessing (handling missing values and normalization) with classification algorithms such as Logistic Regression and Decision Trees. 
+    aquaGuard provides an end-to-end data science pipeline, integrating data preprocessing (handling missing values and normalization) with classification algorithms such as SVM, Decision Trees and Neural Network. 
     Beyond basic prediction, the package emphasizes model interpretability by extracting feature importance rules. 
     Additionally, it features advanced visualization tools, including correlation heatmaps and customized boxplots, enabling users to perform exploratory data analysis and evaluate classifier performance.
 License: GPL (>= 3)
