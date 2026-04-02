@@ -1,71 +1,93 @@
-# 1 读取数据----
-df <- read.csv("water_potability.csv")
-head(df)
-str(df)
-summary(df)
+preprocess_data <- function(file_path, split_ratio = 0.7, seed = 3) {
+  # 1 读取数据----
+  df <- read.csv("water_potability.csv")
+  head(df)
+  str(df)
+  summary(df)
 
-# 2 检查缺失值情况----
-colSums(is.na(df))
+  # 2 检查缺失值情况----
+  colSums(is.na(df))
 
-# 3 用均值填充缺失值----
+  # 3 用均值填充缺失值----
 
-# ph
-df$ph[is.na(df$ph)] <- mean(df$ph, na.rm = TRUE)
-# Sulfate
-df$Sulfate[is.na(df$Sulfate)] <- mean(df$Sulfate, na.rm = TRUE)
-# Trihalomethanes
-df$Trihalomethanes[is.na(df$Trihalomethanes)] <- mean(df$Trihalomethanes, na.rm = TRUE)
+  # ph
+  df$ph[is.na(df$ph)] <- mean(df$ph, na.rm = TRUE)
+  # Sulfate
+  df$Sulfate[is.na(df$Sulfate)] <- mean(df$Sulfate, na.rm = TRUE)
+  # Trihalomethanes
+  df$Trihalomethanes[is.na(df$Trihalomethanes)] <- mean(df$Trihalomethanes, na.rm = TRUE)
 
-colSums(is.na(df))
+  colSums(is.na(df))
 
-# 4 相关性分析-----
-cor_matrix <- cor(df)
-print(cor_matrix)
+  # 4 相关性分析-----
+  cor_matrix <- cor(df)
+  print(cor_matrix)
 
-library(corrplot)
-corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.8)
+  ##library(corrplot)
+  ##corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.8)
 
-# 5 因变量分布：是否可饮用----
-table(df$Potability)
+  # 5 因变量分布：是否可饮用----
+  table(df$Potability)
 
-# 6 划分训练集和测试集----
-library(caTools)
+  # 6 划分训练集和测试集----
+  set.seed(3)
 
-set.seed(3)
+  # 按 70% 训练，30% 测试划分
+  split <- sample.split(df$Potability, SplitRatio = 0.7)
 
-# 按 70% 训练，30% 测试划分
-split <- sample.split(df$Potability, SplitRatio = 0.7)
+  train_data <- subset(df, split == TRUE)
+  test_data  <- subset(df, split == FALSE)
 
-train_data <- subset(df, split == TRUE)
-test_data  <- subset(df, split == FALSE)
+  dim(train_data)
+  dim(test_data)
 
-dim(train_data)
-dim(test_data)
+  # 7 存储训练集和测试集的特征和标签----
+  X_train <- train_data[, -10]   # 去掉 Potability
+  y_train <- train_data$Potability
 
-# 7 存储训练集和测试集的特征和标签----
-X_train <- train_data[, -10]   # 去掉 Potability
-y_train <- train_data$Potability
+  X_test <- test_data[, -10]
+  y_test <- test_data$Potability
 
-X_test <- test_data[, -10]
-y_test <- test_data$Potability
+  # 8 归一化函数----
+  min_vals <- sapply(X_train, min)
+  max_vals <- sapply(X_train, max)
 
-# 8 归一化函数----
-min_max_norm <- function(x) {
-  return((x - min(x)) / (max(x) - min(x)))
+  min_max_norm <- function(x) {
+    return((x - min(x)) / (max(x) - min(x)))
+  }
+
+  X_train_norm <- as.data.frame(lapply(X_train, min_max_norm))
+
+  # 测试集用训练集的 min 和 max
+  X_test_norm <- as.data.frame(mapply(function(x, min_val, max_val) {
+    (x - min_val) / (max_val - min_val)
+  }, X_test, min_vals, max_vals))
+
+  # 注释----
+  # 读入原始数据，对数据结构与基本统计特征进行了初步分析。检查缺失值情况，对存在缺失的变量采用mean imputation
+  # 按 7:3 的比例将数据划分为训练集（train_data）和测试集（test_data）
+  # 输入特征分别存储为 X_train 和 X_test（数据类型为 data.frame），目标变量存储为 y_train 和 y_test（数值型向量，取值为 0/1）
+  # 对特征数据进行Min-Max，归一化后的训练集和测试集分别存储为 X_train_norm 和 X_test_norm（data.frame）
+  # 输入特征：X_train_norm, X_test_norm; 标签数据：y_train, y_test
+
+  return(list(
+    X_train = X_train_norm,
+    X_test  = X_test_norm,
+    y_train = y_train,
+    y_test  = y_test,
+    min_vals = min_vals,   # 用于新数据
+    max_vals = max_vals
+  ))
+
 }
 
-X_train_norm <- as.data.frame(lapply(X_train, min_max_norm))
+# 调用
+result <- preprocess_data("water_potability.csv")
 
-# 测试集用训练集的 min 和 max
-X_test_norm <- as.data.frame(mapply(function(x, min_val, max_val) {
-  (x - min_val) / (max_val - min_val)
-}, X_test,
-min_val = sapply(X_train, min),
-max_val = sapply(X_train, max)))
 
-# 注释----
-# 读入原始数据，对数据结构与基本统计特征进行了初步分析。检查缺失值情况，对存在缺失的变量采用mean imputation
-# 按 7:3 的比例将数据划分为训练集（train_data）和测试集（test_data）
-# 输入特征分别存储为 X_train 和 X_test（数据类型为 data.frame），目标变量存储为 y_train 和 y_test（数值型向量，取值为 0/1）
-# 对特征数据进行Min-Max，归一化后的训练集和测试集分别存储为 X_train_norm 和 X_test_norm（data.frame）
-# 输入特征：X_train_norm, X_test_norm; 标签数据：y_train, y_test
+# 特征
+X_train <- result$X_train
+X_test  <- result$X_test
+# 标签
+y_train <- result$y_train
+y_test  <- result$y_test
