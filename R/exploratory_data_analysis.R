@@ -4,9 +4,9 @@
 #' unnormalized training dataset. It calculates descriptive statistics, evaluates the
 #' distribution of the target variable, computes group means, and identifies outliers.
 #'
-#' @param X A data frame containing the unnormalized numeric features (e.g., X_train).
-#' @param y A numeric vector or factor containing the target variable (e.g., y_train).
+#' @param data A data frame containing the unnormalized training features and target variable.
 #' @param target_name A character string naming the target variable. Default is "Potability".
+#'   The Potability column should be binary (0 = non-potable, 1 = potable).
 #'
 #' @return A list containing the following Exploratory Data Analysis components:
 #' \itemize{
@@ -23,21 +23,18 @@
 #' @examples
 #' \dontrun{
 #' # Assuming 'result' is the list returned by preprocess_data()
-#' eda_results <- Exploratory_Data_analysis(X = result$X_train, y = result$y_train)
+#' eda_results <- Exploratory_Data_analysis(data = result$train_data)
 #'
 #' # View the descriptive statistics
 #' print(eda_results$Descriptive_Statistics)
 #' }
 
-Exploratory_Data_analysis <- function(X, y, target_name = "Potability") {
+Exploratory_Data_analysis <- function(data, target_name = "Potability") {
 
-  # 1. 数据合并与参数校验：将特征和标签组合成一个完整的数据框，方便后续统一分析
-  if (nrow(X) != length(y)) {
-    stop("Error: The number of rows in X must match the length of y.")
+  # 1. 参数校验
+  if (!(target_name %in% colnames(data))) {
+    stop(paste("Error: Target column '", target_name, "' not found in the dataset.", sep = ""))
   }
-
-  data <- X
-  data[[target_name]] <- y
 
   # 初始化一个列表，用于存储并返回所有的探索性分析结果
   eda_results <- list()
@@ -51,10 +48,10 @@ Exploratory_Data_analysis <- function(X, y, target_name = "Potability") {
   calc_stats <- function(x) {
     c(
       Min = min(x, na.rm = TRUE),
-      Q1 = quantile(x, 0.25, na.rm = TRUE), # 25% quantile
+      Q1 = unname(quantile(x, 0.25, na.rm = TRUE)), # 25% quantile
       Median = median(x, na.rm = TRUE),
       Mean = mean(x, na.rm = TRUE),
-      Q3 = quantile(x, 0.75, na.rm = TRUE), # 75% quantile
+      Q3 = unname(quantile(x, 0.75, na.rm = TRUE)), # 75% quantile
       Max = max(x, na.rm = TRUE),
       SD = sd(x, na.rm = TRUE)
     )
@@ -99,10 +96,29 @@ Exploratory_Data_analysis <- function(X, y, target_name = "Potability") {
   # 7. 打印简要总结
   cat("=== Exploratory Data Analysis ===\n")
   cat("Data Source: Unnormalized Training Set\n")
-  cat("Total Observations:", eda_results$Dimensions[1], "\n")
-  cat("Total Features:", eda_results$Dimensions[2] - 1, "(excluding target)\n")
-  cat("\nTarget Distribution (", target_name, "):\n", sep = "")
+
+  # 7.1 基础信息
+  cat("\n[1] Dataset Overview\n")
+  cat("Total Observations :", eda_results$Dimensions[1], "\n")
+  cat("Total Features     :", eda_results$Dimensions[2] - 1, "(excluding target)\n")
+  cat("Target Variable    :", target_name, "\n")
+
+  # 7.2 目标变量分布
+  cat("\n[2] Target Variable Distribution\n")
   print(eda_results$Target_Distribution, row.names = FALSE)
+
+  # 7.3 描述性统计与离群值
+  cat("\n[3] Descriptive Statistics & Outliers\n")
+  stats_with_outliers <- cbind(eda_results$Descriptive_Statistics,
+                               Outliers = eda_results$Outlier_Counts)
+  print(round(stats_with_outliers, 3))
+
+  # 7.4 分组均值分析
+  cat("\n[4] Feature Means Grouped By Target (", target_name, ")\n", sep = "")
+  print(as.data.frame(
+    eda_results$Group_Means %>%
+      mutate(across(where(is.numeric), ~ round(.x, 3)))
+  ), row.names = FALSE)
 
   return(eda_results)
 }
