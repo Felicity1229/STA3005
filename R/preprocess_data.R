@@ -71,8 +71,10 @@ preprocess_data <- function(file_path, split_ratio = 0.7, seed = 3) {
   # 输入特征：X_train_norm, X_test_norm; 标签数据：y_train, y_test
 
   return(list(
-    X_train = X_train_norm,
-    X_test  = X_test_norm,
+    X_train = X_train,
+    X_test  = X_test,
+    X_train_norm = X_train_norm,
+    X_test_norm  = X_test_norm,
     y_train = y_train,
     y_test  = y_test,
     min_vals = min_vals,   # 用于新数据
