@@ -45,6 +45,7 @@ Exploratory_Data_analysis <- function(X, y, target_name = "Potability") {
   eda_results <- list()
 
   # 2. 基础信息提取
+  eda_results$Dimensions <- dim(data)
   numeric_data <- data %>%
     select(where(is.numeric))
 
