@@ -1,12 +1,12 @@
-preprocess_data <- function(file_path, split_ratio = 0.7, seed = 3) {
+preprocess_data <- function(file_path, tag_column, split_ratio = 0.7, seed = 3) {
   # 1 读取数据----
-  df <- read.csv("water_potability.csv")
-  head(df)
-  str(df)
-  summary(df)
+  df <- read.csv(file_path)
+  # head(df)
+  # str(df)
+  # summary(df)
 
   # 2 检查缺失值情况----
-  colSums(is.na(df))
+  # colSums(is.na(df))
 
   # 3 用均值填充缺失值----
 
@@ -26,14 +26,12 @@ preprocess_data <- function(file_path, split_ratio = 0.7, seed = 3) {
   ##library(corrplot)
   ##corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.8)
 
-  # 5 因变量分布：是否可饮用----
-  table(df$Potability)
-
   # 6 划分训练集和测试集----
-  set.seed(3)
+  library(caTools)
+  set.seed(seed)
 
   # 按 70% 训练，30% 测试划分
-  split <- sample.split(df$Potability, SplitRatio = 0.7)
+  split <- sample.split(df$Potability, SplitRatio = split_ratio)
 
   train_data <- subset(df, split == TRUE)
   test_data  <- subset(df, split == FALSE)
@@ -42,10 +40,10 @@ preprocess_data <- function(file_path, split_ratio = 0.7, seed = 3) {
   dim(test_data)
 
   # 7 存储训练集和测试集的特征和标签----
-  X_train <- train_data[, -10]   # 去掉 Potability
+  X_train <- train_data[, tag_column]   # 去掉 Potability
   y_train <- train_data$Potability
 
-  X_test <- test_data[, -10]
+  X_test <- test_data[, tag_column]
   y_test <- test_data$Potability
 
   # 8 归一化函数----
@@ -75,6 +73,8 @@ preprocess_data <- function(file_path, split_ratio = 0.7, seed = 3) {
     X_test  = X_test_norm,
     y_train = y_train,
     y_test  = y_test,
+    train_data = train_data,
+    cor_matrix = cor_matrix,
     min_vals = min_vals,   # 用于新数据
     max_vals = max_vals
   ))
@@ -82,8 +82,8 @@ preprocess_data <- function(file_path, split_ratio = 0.7, seed = 3) {
 }
 
 # 调用
-result <- preprocess_data("water_potability.csv")
-
+file_path = "water_potability.csv"
+result <- preprocess_data(file_path, tag_column = -10)
 
 # 特征
 X_train <- result$X_train
