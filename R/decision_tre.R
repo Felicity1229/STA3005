@@ -4,7 +4,6 @@ if (!requireNamespace("rpart.plot", quietly = TRUE)) install.packages("rpart.plo
 if (!requireNamespace("caret", quietly = TRUE)) install.packages("caret")
 
 library(rpart)
-library(rpart.plot)
 library(caret)
 
 #' Decision Tree
@@ -13,7 +12,6 @@ library(caret)
 #' @param y_train Training set labels (vector, 0/1 numeric or factor)
 #' @param X_test Testing set features (data.frame)
 #' @param y_test Testing set labels (vector, 0/1 numeric or factor)
-#' @param cp Complexity parameter, used for pruning to control tree size (avoid overfitting). Default is 0.01
 #' @return Returns a list containing the trained model object, predictions, and detailed evaluation metrics
 decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
 
@@ -24,17 +22,32 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
   test_data  <- data.frame(X_test, target = as.factor(y_test))
 
   # 2. Model training
-  # `method = "class"`: specifies a classification task
-  # `target ~ .`: predicts the target using all other columns
   print("Training Decision Tree Model...")
-  dt_model <- rpart(target ~ .,
-                    data = train_data,
-                    method = "class",
-                    control = rpart.control(cp = cp))
+
+  # Set up 10-fold cross-validation
+  train_control <- trainControl(method = "cv", number = 10)
+
+  cv_model <- train(
+    target ~ .,
+    data = train_data,
+    method = "rpart",
+    trControl = train_control,
+    # Find the best Complexity Parameter `cp` between 0.001 and 0.1
+    tuneGrid = expand.grid(cp = seq(0.001, 0.1, by = 0.005)),
+    # Prevent the tree growing infinitely
+    # Set minimum split and maximum depth
+    control = rpart.control(minsplit = 20, maxdepth = 15)
+  )
+
+  # Extract the best decision tree
+  dt_model <- cv_model$finalModel
+  print(paste("Best tuned cp selected by model:", cv_model$bestTune$cp))
 
   # 3. Model Prediction
-  # `type = "class"`: returns the predicted class labels
-  predictions <- predict(dt_model, newdata = test_data, type = "class")
+  # Return the predicted class labels
+  predictions <- predict(cv_model, newdata = test_data, type = "class")
+  # Return the predicted probability of belonging to each class
+  pred_prob <- predict(cv_model, newdata = test_data, type = "prob")
 
   # 4. Performance Evaluation
   # Ensure prediction and y_test factor levels are consistent to avoid caret errors
@@ -47,7 +60,7 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
   # Print core evaluation results
   print("===== Decision Tree Evaluation =====")
   cat("Accuracy :", round(conf_matrix$overall["Accuracy"], 4), "\n")
-  cat("Kappa    :", round(conf_matrix$overall["Kappa"], 4), "\n")
+  cat("Kappa    :", round(conf_matrix$overall["Kappa"], 4), "\n") # avoid the imbalance of datasets
   print(conf_matrix$table)
 
   # 5. Plot the decision tree structure
@@ -57,6 +70,8 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
   return(list(
     model = dt_model,
     predictions = predictions,
-    metrics = conf_matrix
+    metrics = conf_matrix,
+    pred_prob = pred_prob[, 2],
+    model_name = "Decision Tree"
   ))
 }
