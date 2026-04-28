@@ -1,0 +1,32 @@
+---
+title: "NN_prac"
+output: html_document
+---
+```{r}
+# In this block,we call the trainModel() to train our model
+train_model <- trainModel(
+  X = X_train,
+  y = y_train,
+  num_iteration = 2000,
+  hidden_neurons = 15,
+  lr = 0.1,  # 试试 0.1 或 0.01
+  verbose = TRUE
+)
+```
+```{r}
+plot(train_model$cost_hist, type = "l", 
+     xlab = "Iteration", ylab = "Cost",
+     main = "Training Loss")
+```
+```{r}
+# Making prediction using the test data
+pred_prob <- makePrediction(X_test, train_model$updated_params, hidden_neurons = 15)
+pred_class <- ifelse(pred_prob > 0.5, 1, 0)
+
+# We here build a confusion matrix
+accuracy <- mean(pred_class == y_test)
+cat("Accuracy:", round(accuracy, 4), "\n")
+
+table(Predicted = pred_class, Actual = y_test)
+```
+
