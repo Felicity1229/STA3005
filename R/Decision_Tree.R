@@ -4,6 +4,7 @@ if (!requireNamespace("rpart.plot", quietly = TRUE)) install.packages("rpart.plo
 if (!requireNamespace("caret", quietly = TRUE)) install.packages("caret")
 
 library(rpart)
+library(rpart.plot)
 library(caret)
 
 #' Decision Tree
