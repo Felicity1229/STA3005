@@ -7,16 +7,17 @@ output: html_document
 train_model <- trainModel(
   X = X_train,
   y = y_train,
-  num_iteration = 2000,
+  num_iteration = 5000,
   hidden_neurons = 15,
-  lr = 0.1,  # 试试 0.1 或 0.01
+  lr = 0.01,  # 试试 0.1 或 0.01
   verbose = TRUE
 )
 ```
 ```{r}
 plot(train_model$cost_hist, type = "l", 
      xlab = "Iteration", ylab = "Cost",
-     main = "Training Loss")
+     main = "Training Loss",
+     col="red")
 ```
 ```{r}
 # Making prediction using the test data

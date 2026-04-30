@@ -14,29 +14,6 @@ getLayerSize <- function(X, y, hidden_neurons) {
   return(size)
 }
 
-# initializeParameters <- function(list_layer_size){
-#   n_x <- list_layer_size$n_x
-#   n_h <- list_layer_size$n_h
-#   n_y <- list_layer_size$n_y
-#
-#   # W1 <- matrix(runif(n_h * n_x), nrow = n_h, ncol = n_x, byrow = TRUE) * 0.01
-#   # b1 <- matrix(rep(0, n_h), nrow = n_h)
-#   # W2 <- matrix(runif(n_y * n_h), nrow = n_y, ncol = n_h, byrow = TRUE) * 0.01
-#   # b2 <- matrix(rep(0, n_y), nrow = n_y)
-#
-#   W1 <- matrix(rnorm(n_h * n_x, 0, sqrt(2/(n_x + n_h))), nrow = n_h, ncol = n_x)
-#   b1 <- matrix(0, nrow = n_h, ncol = 1)
-#   W2 <- matrix(rnorm(n_y * n_h, 0, sqrt(2/(n_h + n_y))), nrow = n_y, ncol = n_h)
-#   b2 <- matrix(0, nrow = n_y, ncol = 1)
-#
-#   params <- list("W1" = W1,
-#                  "b1" = b1,
-#                  "W2" = W2,
-#                  "b2" = b2)
-#
-#   return (params)
-# }
-
 initializeParameters <- function(X, list_layer_size){
   n_x <- list_layer_size$n_x
   n_h <- list_layer_size$n_h
@@ -97,14 +74,6 @@ forwardPropagation <- function(X, params, list_layer_size){
 
 # We will use Binary Cross Entropy loss function (aka log loss)
 
-# computeCost <- function(X, y, cache) {
-#   m <- dim(X)[2]
-#   A2 <- cache$A2
-#   logprobs <- (log(A2) * y) + (log(1-A2) * (1-y))
-#   cost <- -sum(logprobs/m)
-#   return (cost)
-# }
-
 computeCost <- function(X, y, cache) {
   m <- dim(X)[2]
   A2 <- cache$A2
@@ -125,37 +94,6 @@ computeCost <- function(X, y, cache) {
   cost <- -sum(weights * logprobs) / m
   return(cost)
 }
-
-# Back propagation part
-# backwardPropagation <- function(X, y, cache, params, list_layer_size){
-#
-#   m <- dim(X)[2]
-#
-#   n_x <- list_layer_size$n_x
-#   n_h <- list_layer_size$n_h
-#   n_y <- list_layer_size$n_y
-#
-#   A2 <- cache$A2
-#   A1 <- cache$A1
-#   W2 <- params$W2
-#
-#   dZ2 <- A2 - y
-#   dW2 <- 1/m * (dZ2 %*% t(A1))
-#   db2 <- matrix(1/m * sum(dZ2), nrow = n_y)
-#   db2_new <- matrix(rep(db2, m), nrow = n_y)
-#
-#   dZ1 <- (t(W2) %*% dZ2) * (1 - A1^2)
-#   dW1 <- 1/m * (dZ1 %*% t(X))
-#   db1 <- matrix(1/m * sum(dZ1), nrow = n_h)
-#   db1_new <- matrix(rep(db1, m), nrow = n_h)
-#
-#   grads <- list("dW1" = dW1,
-#                 "db1" = db1,
-#                 "dW2" = dW2,
-#                 "db2" = db2)
-#
-#   return(grads)
-# }
 
 backwardPropagation <- function(X, y, cache, params, list_layer_size, use_weights = TRUE) {
   m <- ncol(X)
@@ -192,31 +130,6 @@ backwardPropagation <- function(X, y, cache, params, list_layer_size, use_weight
   return(list(dW1 = dW1, db1 = db1, dW2 = dW2, db2 = db2))
 }
 
-# updateParameters <- function(grads, params, learning_rate){
-#
-#   W1 <- params$W1
-#   b1 <- params$b1
-#   W2 <- params$W2
-#   b2 <- params$b2
-#
-#   dW1 <- grads$dW1
-#   db1 <- grads$db1
-#   dW2 <- grads$dW2
-#   db2 <- grads$db2
-#
-#
-#   W1 <- W1 - learning_rate * dW1
-#   b1 <- b1 - learning_rate * db1
-#   W2 <- W2 - learning_rate * dW2
-#   b2 <- b2 - learning_rate * db2
-#
-#   updated_params <- list("W1" = W1,
-#                          "b1" = b1,
-#                          "W2" = W2,
-#                          "b2" = b2)
-#
-#   return (updated_params)
-# }
 
 updateParameters <- function(grads, params, learning_rate) {
   params$W1 <- params$W1 - learning_rate * grads$dW1
@@ -227,48 +140,19 @@ updateParameters <- function(grads, params, learning_rate) {
   return(params)
 }
 
-# Here we wrap out all functions above, and by calling this function, our NN training starts
-# trainModel <- function(X, y, num_iteration, hidden_neurons, lr){
-#
-#   layer_size <- getLayerSize(X, y, hidden_neurons)
-#   init_params <- initializeParameters(X, layer_size)
-#   cost_history <- c()
-#   for (i in 1:num_iteration) {
-#     fwd_prop <- forwardPropagation(X, init_params, layer_size)
-#     cost <- computeCost(X, y, fwd_prop)
-#     back_prop <- backwardPropagation(X, y, fwd_prop, init_params, layer_size)
-#     update_params <- updateParameters(back_prop, init_params, learning_rate = lr)
-#     init_params <- update_params
-#     cost_history <- c(cost_history, cost)
-#
-#     if (i %% 10000 == 0) cat("Iteration", i, " | Cost: ", cost, "\n")
-#   }
-#
-#   model_out <- list("updated_params" = update_params,
-#                     "cost_hist" = cost_history)
-#   return (model_out)
-# }
-
+# Here we wrap out all functions above,
+# and by calling this function, our NN training starts
 trainModel <- function(X, y, num_iteration, hidden_neurons, lr, verbose = TRUE) {
   layer_size <- getLayerSize(X, y, hidden_neurons)
   params <- initializeParameters(X, layer_size)
   cost_history <- c()
 
   for (i in 1:num_iteration) {
-    # 前向传播
     fwd_prop <- forwardPropagation(X, params, layer_size)
-
-    # 计算损失
     cost <- computeCost(X, y, fwd_prop)
-
-    # 反向传播
     back_prop <- backwardPropagation(X, y, fwd_prop, params, layer_size, use_weights = TRUE)
-
-    # 更新参数
     params <- updateParameters(back_prop, params, lr)
-
     cost_history <- c(cost_history, cost)
-
     if(verbose && i %% 100 == 0) {
       cat("Iteration", i, " | Cost: ", round(cost, 6), "\n")
     }
@@ -278,15 +162,6 @@ trainModel <- function(X, y, num_iteration, hidden_neurons, lr, verbose = TRUE) 
 }
 
 # Test the Model
-# makePrediction <- function(X, y, hidden_neurons){
-#   layer_size <- getLayerSize(X, y, hidden_neurons)
-#   params <- train_model$updated_params
-#   fwd_prop <- forwardPropagation(X, params, layer_size)
-#   pred <- fwd_prop$A2
-#
-#   return (pred)
-# }
-
 makePrediction <- function(X, params, hidden_neurons) {
   layer_size <- list(n_x = nrow(X), n_h = hidden_neurons, n_y = 1)
   fwd_prop <- forwardPropagation(X, params, layer_size)
@@ -305,5 +180,12 @@ calculate_stats <- function(tb, model_name) {
   cat("\n\tPrecision = ", precision*100, "%.")
   cat("\n\tRecall = ", recall*100, "%.")
   cat("\n\tF1 Score = ", f1*100, "%.\n\n")
+}
+
+NN_performance = function(model_name = "Neural Network",test_data,train_model,hidden_neurons){
+  updated_params = train_model$updated_params
+  pred_prob = makePrediction(test_data,updated_params,hidden_neurons)
+  pred_class = ifelse(pred_prob > 0.5,1,0)
+  return(list(model_name = model_name,predictions=pred_class,pred_prob=pred_prob,model=train_model))
 }
 
