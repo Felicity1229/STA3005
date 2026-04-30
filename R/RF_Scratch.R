@@ -171,10 +171,10 @@ rf_scratch <- train_rf_scratch(
 
 # 调用
 
-pred_result <- predict_rf(rf_scratch, result$X_test_norm)
+rf_result <- predict_rf(rf_scratch, result$X_test_norm)
 
-predictions <- pred_result$predictions
-pred_prob   <- pred_result$pred_prob
+predictions <- rf_result$predictions
+pred_prob   <- rf_result$pred_prob
 
 evaluate_model(result$y_test, predictions)
 pred_prob

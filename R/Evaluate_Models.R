@@ -28,29 +28,29 @@ evaluate_models <- function(true_labels, models_results, positive_class) {
   roc_list <- list() # Store ROC objects for plotting
 
   # 1. Loop through each model to calculate metrics
-  for (res in models_results) {
-    name <- res$model_name
-    pred_c <- res$predictions
-    pred_p <- res$pred_prob
+  labels_factor <- factor(true_labels, levels = c("0", "1"))
+  name <- models_results$model_name
+  pred_c <- models_results$predictions
+  pred_p <- models_results$pred_prob
 
-    # Calculate Confusion Matrix (mode="everything" gives F1, Precision, Recall)
-    cm <- confusionMatrix(pred_c, true_labels, positive = positive_class, mode = "everything")
+  # Calculate Confusion Matrix (mode="everything" gives F1, Precision, Recall)
+  cm <- confusionMatrix(pred_c, labels_factor, positive = positive_class, mode = "everything")
 
-    # Calculate ROC and AUC
-    roc_obj <- roc(true_labels, pred_p, quiet = TRUE)
-    auc_val <- as.numeric(auc(roc_obj))
-    roc_list[[name]] <- roc_obj
+  # Calculate ROC and AUC
+  roc_obj <- roc(labels_factor, pred_p, quiet = TRUE)
+  auc_val <- as.numeric(auc(roc_obj))
+  roc_list[[name]] <- roc_obj
 
-    # Append to dataframe
-    metrics_df <- rbind(metrics_df, data.frame(
-      Model = name,
-      Accuracy = cm$overall["Accuracy"],
-      F1_Score = cm$byClass["F1"],
-      Precision = cm$byClass["Precision"],
-      Recall = cm$byClass["Recall"],
-      AUC = auc_val
-    ))
-  }
+  # Append to dataframe
+  metrics_df <- rbind(metrics_df, data.frame(
+    Model = name,
+    Accuracy = cm$overall["Accuracy"],
+    F1_Score = cm$byClass["F1"],
+    Precision = cm$byClass["Precision"],
+    Recall = cm$byClass["Recall"],
+    AUC = auc_val
+  ))
+
 
   print("===== Multi-Model Comparison Metrics =====")
   print(metrics_df)
@@ -82,3 +82,9 @@ evaluate_models <- function(true_labels, models_results, positive_class) {
 
   return(metrics_df)
 }
+
+evaluate_models(y_test, NN, "1")
+evaluate_models(y_test, svm_result, "1")
+evaluate_models(y_test, rf_result, "1")
+evaluate_models(y_test, xgb_result, "1")
+

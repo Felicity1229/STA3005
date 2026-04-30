@@ -93,25 +93,26 @@ train_xgb_full <- function(X_train, y_train, X_test, y_test) {
 
   return(list(
     model = model,
-    auc = auc(roc_obj),
+    # auc = auc(roc_obj),
     best_threshold = th$best_threshold,
-    importance = imp
+    importance = imp,
+    model_name = "XGBoost",
+    predictions = factor(pred, levels=c("0", "1")),
+    pred_prob = prob
   ))
 }
 
 # result <- preprocess_data("Breast_Cancer.csv")
 
-X_train <- result$X_train_norm
-X_test  <- result$X_test_norm
-y_train <- result$y_train
-y_test  <- result$y_test
-
 xgb_result <- train_xgb_full(
-  X_train = X_train,
-  y_train = y_train,
-  X_test  = X_test,
-  y_test  = y_test
+  X_train = result$X_train_norm,
+  y_train = result$y_train,
+  X_test  = result$X_test_norm,
+  y_test  = result$y_test
 )
+
+predictions = xgb_result$predictions
+pred_prob = xgb_result$pred_prob
 
 prob <- predict(xgb_result$model,
                 xgb.DMatrix(as.matrix(X_test)))
