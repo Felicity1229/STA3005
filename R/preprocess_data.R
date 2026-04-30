@@ -117,8 +117,8 @@ preprocess_data <- function(file_path, tag_column, split_ratio = 0.7, seed = 3) 
 }
 
 # 调用
-file_path = "E:/Semester6_Year3Term2/STA3005/STA3005/R/water_potability.csv"
-result <- preprocess_data(file_path, tag_column = 10)
+file_path = "E:/Semester6_Year3Term2/STA3005/STA3005/R/heart.csv"
+result <- preprocess_data(file_path, tag_column = 14)
 
 # 特征
 X_train <- result$X_train

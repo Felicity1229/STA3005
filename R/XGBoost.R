@@ -1,5 +1,5 @@
 library(xgboost)
-library(pROC)
+# library(pROC)
 
 train_xgb_full <- function(X_train, y_train, X_test, y_test) {
 
@@ -23,7 +23,7 @@ train_xgb_full <- function(X_train, y_train, X_test, y_test) {
     colsample_bytree = 0.8
   )
 
-  cat("\n🔥 Training XGBoost...\n")
+  cat("\nTraining XGBoost...\n")
 
   model <- xgb.train(
     params = params,
@@ -34,20 +34,15 @@ train_xgb_full <- function(X_train, y_train, X_test, y_test) {
     verbose = 1
   )
 
-  # =========================
-  # 1. 预测概率
-  # =========================
+  # 预测概率----
   prob <- predict(model, dtest)
 
+  # ROC + AUC
   # =========================
-  # 2. ROC + AUC
-  # =========================
-  roc_obj <- roc(y_test, prob)
-  cat("\n🔥 XGBoost AUC:", auc(roc_obj), "\n")
+  # roc_obj <- roc(y_test, prob)
+  # cat("\nXGBoost AUC:", auc(roc_obj), "\n")
 
-  # =========================
-  # 3. 自动找 threshold（F1）
-  # =========================
+  # 自动找 threshold（F1）
   find_best_threshold <- function(prob, y_true) {
 
     thresholds <- seq(0.1, 0.9, 0.01)
@@ -79,30 +74,23 @@ train_xgb_full <- function(X_train, y_train, X_test, y_test) {
 
   th <- find_best_threshold(prob, y_test)
 
-  cat("\n🔥 Best threshold:", th$best_threshold)
-  cat("\n🔥 Best F1:", th$best_f1, "\n")
+  cat("\nBest threshold:", th$best_threshold)
+  cat("\nBest F1:", th$best_f1, "\n")
 
-  # =========================
-  # 4. 用最佳 threshold 分类
-  # =========================
+  # 用最佳 threshold 分类
   pred <- ifelse(prob > th$best_threshold, 1, 0)
 
   cm <- table(Predicted = pred, Actual = y_test)
 
-  cat("\n=== Confusion Matrix ===\n")
+  cat("\nConfusion Matrix\n")
   print(cm)
 
-  # =========================
-  # 5. feature importance
-  # =========================
+  # feature importance
   imp <- xgb.importance(model = model)
 
-  cat("\n=== Feature Importance ===\n")
+  cat("\nFeature Importance：\n")
   print(imp)
 
-  # =========================
-  # 6. 返回
-  # =========================
   return(list(
     model = model,
     auc = auc(roc_obj),
@@ -111,7 +99,7 @@ train_xgb_full <- function(X_train, y_train, X_test, y_test) {
   ))
 }
 
-result <- preprocess_data("water_potability.csv")
+# result <- preprocess_data("Breast_Cancer.csv")
 
 X_train <- result$X_train_norm
 X_test  <- result$X_test_norm
@@ -128,28 +116,28 @@ xgb_result <- train_xgb_full(
 prob <- predict(xgb_result$model,
                 xgb.DMatrix(as.matrix(X_test)))
 
-roc_xgb <- roc(y_test, prob)
+# roc_xgb <- roc(y_test, prob)
 
-plot(roc_xgb, col = "red", lwd = 2,
-     main = "ROC - XGBoost")
+# plot(roc_xgb, col = "red", lwd = 2,
+#      main = "ROC - XGBoost")
 
 
 
 
 # 预测概率（RF）
-rf_prob <- predict(rf_result$model, result$X_test, type = "prob")[,2]
+# rf_prob <- predict(rf_result$model, result$X_test, type = "prob")[,2]
 
 # ROC
-roc_obj <- roc(result$y_test, rf_prob)
+# roc_obj <- roc(result$y_test, rf_prob)
 
-plot(roc_xgb, col = "red", lwd = 2,
-     main = "ROC Comparison (RF vs XGBoost)")
+# plot(roc_xgb, col = "red", lwd = 2,
+#     main = "ROC Comparison (RF vs XGBoost)")
 
-lines(roc_obj, col = "blue", lwd = 2)
+# lines(roc_obj, col = "blue", lwd = 2)
 
-legend("bottomright",
-       legend = c("XGBoost", "Random Forest"),
-       col = c("red", "blue"),
-       lwd = 2)
+# legend("bottomright",
+#        legend = c("XGBoost", "Random Forest"),
+#        col = c("red", "blue"),
+#        lwd = 2)
 
-auc(roc_xgb)
+# auc(roc_xgb)

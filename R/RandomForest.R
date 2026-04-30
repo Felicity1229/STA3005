@@ -179,7 +179,7 @@ train_random_forest <- function(X_train, y_train,
 }
 
 
-result <- preprocess_data("water_potability.csv")
+result <- preprocess_data("Breast_Cancer.csv")
 
 rf_result <- train_random_forest(
   X_train = result$X_train,
