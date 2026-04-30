@@ -186,6 +186,7 @@ NN_performance = function(model_name = "Neural Network",test_data,train_model,hi
   updated_params = train_model$updated_params
   pred_prob = makePrediction(test_data,updated_params,hidden_neurons)
   pred_class = ifelse(pred_prob > 0.5,1,0)
+  pred_class = factor(pred_class,levels=c("0","1"))
   return(list(model_name = model_name,predictions=pred_class,pred_prob=pred_prob,model=train_model))
 }
 
