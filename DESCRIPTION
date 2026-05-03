@@ -11,9 +11,9 @@ Authors@R:
 Maintainer: Yibing Zhang <123090837@link.cuhk.edu.cn>
 Description: A comprehensive R package for binary classification tasks using five 
     machine learning algorithms: Support Vector Machines (SVM), 
-    Decision Trees, Random Forest, XGBoost, and Neural Networks. The package provides 
-    an end-to-end pipeline including data preprocessing, model training, performance evaluation, and model comparison. Features include standardized 
-    evaluation metrics (accuracy, precision, recall, F1, AUC-ROC), visualization tools 
+    Decision Trees, Random Forest, XGBoost, and Neural Networks.
+    The package provides an end-to-end pipeline including data preprocessing, model training, performance evaluation, and model comparison. 
+    Features include standardized evaluation metrics (accuracy, precision, recall, F1, AUC-ROC), visualization tools 
     for model comparison, and interpretability methods (feature importance, decision rules).
 License: GPL (>= 3)
 Encoding: UTF-8
@@ -36,3 +36,6 @@ Suggests:
     rmarkdown,
     rpart.plot
 Config/testthat/edition: 3
+Depends: 
+    R (>= 3.5)
+LazyData: true
