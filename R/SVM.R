@@ -57,9 +57,6 @@ NULL
 #' pred_prob <- result$pred_prob
 #' }
 #' @export
-
-library(e1071)
-
 train_svm_model <- function(X_train, y_train,
                             X_test = NULL, y_test = NULL,
                             kernel_type = "radial",

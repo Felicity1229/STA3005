@@ -59,10 +59,6 @@ NULL
 #' importance  <- xgb_result$importance
 #' }
 #' @export
-
-# Load required libraries
-library(xgboost)
-
 train_xgb_full <- function(X_train, y_train, X_test, y_test) {
 
   # Convert input data to matrix format
