@@ -14,10 +14,10 @@
 #'
 #' @author Xinyi Hu
 #'
-#' @import caret
-#' @import pROC
-#' @import ggplot2
-#' @export
+#' @importFrom caret
+#' @importFrom pROC
+#' @importFrom ggplot2
+#' @exportFrom
 #'
 #' @examples
 #' \dontrun{

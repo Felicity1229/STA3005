@@ -19,7 +19,7 @@
 #'
 #' @author Xinyi Hu
 #'
-#' @import dplyr
+#' @importFrom dplyr
 #' @export
 #'
 #' @examples

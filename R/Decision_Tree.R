@@ -23,10 +23,10 @@
 #'
 #' @author Xinyi Hu
 #'
-#' @import caret
-#' @import rpart
-#' @import rpart.plot
-#' @export
+#' @importFrom caret
+#' @importFrom rpart
+#' @importFrom rpart.plot
+#' @exportFrom
 #'
 #' @examples
 #' \dontrun{
