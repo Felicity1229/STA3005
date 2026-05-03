@@ -19,11 +19,11 @@ License: GPL (>= 3)
 Encoding: UTF-8
 Imports: 
     ggplot2,
+    reshape2,
     stats,
     dplyr,
     rpart,
     e1071,
-    randomForest,
     xgboost,
     caret,
     pROC,
@@ -35,11 +35,10 @@ VignetteBuilder: knitr
 Suggests: 
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown,
-    rpart.plot
+    rmarkdown
 Config/testthat/edition: 3
 Depends: 
     R (>= 3.5)
 LazyData: true
 Config/roxygen2/version: 8.0.0
-RoxygenNote: 7.3.3
+RoxygenNote: 8.0.0

@@ -12,7 +12,7 @@
 #'   \item{T.Stage}{Tumor stage: T1, T2, T3, T4 (ordered, increasing severity)}
 #'   \item{N.Stage}{Node stage: N1, N2, N3 (ordered, increasing metastasis)}
 #'   \item{X6th.Stage}{Overall cancer stage: IIA, IIB, IIIA, IIIB, IIIC}
-#'   \item{Differentiate}{Degree of differentiation: Well, Moderate, Poor, Undifferentiated}
+#'   \item{differentiate}{Degree of differentiation: Well, Moderate, Poor, Undifferentiated}
 #'   \item{Grade}{Tumor grade: 1, 2, 3, 4}
 #'   \item{Estrogen.Status}{Estrogen receptor status: 1 = Positive, 0 = Negative}
 #'   \item{Progesterone.Status}{Progesterone receptor status: 1 = Positive, 0 = Negative}

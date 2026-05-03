@@ -39,6 +39,7 @@ NULL
 #'   \item{max_vals}{Maximum values for each numeric feature (for normalization)}
 #'
 #' @importFrom caTools sample.split
+#' @importFrom stats median quantile sd var
 #'
 #' @examples
 #' \dontrun{
@@ -95,16 +96,11 @@ pre_process_data <- function(file_path, tag_column, split_ratio = 0.7, seed = 3)
     print("The correlation matrix cannot be calculated.")
   }
 
-  ## Optional: Visualize correlation matrix with corrplot
-  ## library(corrplot)
-  ## corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.8)
-
   # 5. Check target variable distribution
   # Display frequency table of the target variable
   print(table(df[[tag_col_name]]))
 
   # 6. Split data into training and test sets
-  library(caTools)
   set.seed(seed)
 
   # Stratified split based on target variable
