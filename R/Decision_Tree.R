@@ -23,10 +23,11 @@
 #'
 #' @author Xinyi Hu
 #'
-#' @importFrom caret
-#' @importFrom rpart
-#' @importFrom rpart.plot
-#' @exportFrom
+#' @importFrom caret train trainControl confusionMatrix
+#' @importFrom rpart rpart.control
+#' @importFrom rpart.plot rpart.plot
+#' @importFrom stats predict na.omit
+#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -39,28 +40,26 @@
 decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
 
   # 1. Data restructuring
-  # Drop columns with only one character
-  valid_cols <- sapply(X_train, function(x) length(unique(na.omit(x))) > 1)
+  # Drop columns with only one unique value (zero variance)
+  valid_cols <- sapply(X_train, function(x) length(unique(stats::na.omit(x))) > 1)
   removed_cols <- names(valid_cols)[!valid_cols]
   if (length(removed_cols) > 0) {
     message("Removed columns: ", paste(removed_cols, collapse = ", "))
   }
   X_train <- X_train[, valid_cols, drop = FALSE]
   X_test <- X_test[, valid_cols, drop = FALSE]
+
   # To ensure generality for classification, force the target variable to be a factor
-  # Rename the label to a unified "target"
   y_train <- as.factor(y_train)
   y_test <- as.factor(y_test)
-  train_data <- data.frame(X_train, target = y_train)
-  test_data  <- data.frame(X_test, target = y_test)
 
   # 2. Model training
-  print("Training Decision Tree Model...")
+  message("Training Decision Tree Model...")
 
   # Set up 10-fold cross-validation
-  train_control <- trainControl(method = "cv", number = 10)
+  train_control <- caret::trainControl(method = "cv", number = 10)
 
-  cv_model <- train(
+  cv_model <- caret::train(
     x = X_train,
     y = y_train,
     method = "rpart",
@@ -68,36 +67,32 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
     # Find the best Complexity Parameter `cp` between 0.001 and 0.1
     tuneGrid = expand.grid(cp = seq(0.001, 0.1, by = 0.005)),
     # Prevent the tree growing infinitely
-    # Set minimum split and maximum depth
-    control = rpart.control(minsplit = 20, maxdepth = 15)
+    control = rpart::rpart.control(minsplit = 20, maxdepth = 15)
   )
 
   # Extract the best decision tree
   dt_model <- cv_model$finalModel
-  print(paste("Best tuned cp selected by model:", cv_model$bestTune$cp))
+  message(paste("Best tuned cp selected by model:", cv_model$bestTune$cp))
 
   # 3. Model Prediction
-  # Return the predicted class labels
-  predictions <- predict(cv_model, newdata = X_test)
-  # Return the predicted probability of belonging to each class
-  pred_prob <- predict(cv_model, newdata = X_test, type = "prob")
+  predictions <- stats::predict(cv_model, newdata = X_test)
+  pred_prob <- stats::predict(cv_model, newdata = X_test, type = "prob")
 
   # 4. Performance Evaluation
-  # Ensure prediction and y_test factor levels are consistent to avoid caret errors
-  # Caret errors occur when the test set is small so that it only contains partial levels
+  # Ensure levels are consistent
   levels_pred <- levels(predictions)
-  test_target <- factor(test_data$target, levels = levels_pred)
+  test_target <- factor(y_test, levels = levels_pred)
 
-  conf_matrix <- confusionMatrix(predictions, test_target) # Compare test results with predictions
+  conf_matrix <- caret::confusionMatrix(predictions, test_target)
 
   # Print core evaluation results
-  print("===== Decision Tree Evaluation =====")
+  message("===== Decision Tree Evaluation =====")
   cat("Accuracy :", round(conf_matrix$overall["Accuracy"], 4), "\n")
-  cat("Kappa    :", round(conf_matrix$overall["Kappa"], 4), "\n") # avoid the imbalance of datasets
+  cat("Kappa    :", round(conf_matrix$overall["Kappa"], 4), "\n")
   print(conf_matrix$table)
 
   # 5. Plot the decision tree structure
-  rpart.plot(dt_model, main = "Decision Tree Structure", type = 4, extra = 104)
+  rpart.plot::rpart.plot(dt_model, main = "Decision Tree Structure", type = 4, extra = 104)
 
   # Return the result
   return(list(

@@ -19,7 +19,8 @@
 #'
 #' @author Xinyi Hu
 #'
-#' @importFrom dplyr
+#' @importFrom dplyr select where group_by summarise across mutate .data %>%
+#' @importFrom stats median sd quantile
 #' @export
 #'
 #' @examples
@@ -30,7 +31,6 @@
 #' # View the descriptive statistics
 #' print(eda_results$Descriptive_Statistics)
 #' }
-
 Exploratory_Data_analysis <- function(data, target_name = "Potability") {
 
   # 1. Parameter Validation
@@ -43,19 +43,19 @@ Exploratory_Data_analysis <- function(data, target_name = "Potability") {
 
   # 2. Extract Basic Information
   eda_results$Dimensions <- dim(data)
-  numeric_data <- data %>%
-    select(where(is.numeric))
+
+  numeric_data <- dplyr::select(data, dplyr::where(is.numeric))
 
   # 3. Detailed Descriptive Statistics
   calc_stats <- function(x) {
     c(
       Min = min(x, na.rm = TRUE),
-      Q1 = unname(quantile(x, 0.25, na.rm = TRUE)), # 25% quantile
-      Median = median(x, na.rm = TRUE),
+      Q1 = unname(stats::quantile(x, 0.25, na.rm = TRUE)),
+      Median = stats::median(x, na.rm = TRUE),
       Mean = mean(x, na.rm = TRUE),
-      Q3 = unname(quantile(x, 0.75, na.rm = TRUE)), # 75% quantile
+      Q3 = unname(stats::quantile(x, 0.75, na.rm = TRUE)),
       Max = max(x, na.rm = TRUE),
-      SD = sd(x, na.rm = TRUE)
+      SD = stats::sd(x, na.rm = TRUE)
     )
   }
 
@@ -75,16 +75,17 @@ Exploratory_Data_analysis <- function(data, target_name = "Potability") {
   eda_results$Target_Distribution <- dist_df
 
   # 5. Group Means by Target
-  group_means <- data %>%
-    group_by(.data[[target_name]]) %>%
-    summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)))
-  colnames(group_means)[1] <- target_name
-  eda_results$Group_Means <- group_means
+  eda_results$Group_Means <- data %>%
+    dplyr::group_by(.data[[target_name]]) %>%
+    dplyr::summarise(dplyr::across(dplyr::where(is.numeric), ~ mean(.x, na.rm = TRUE)))
+
+  colnames(eda_results$Group_Means)[1] <- target_name
 
   # 6. Outlier Detection using IQR method
   detect_outliers_iqr <- function(x) {
-    Q1 <- quantile(x, 0.25, na.rm = TRUE)
-    Q3 <- quantile(x, 0.75, na.rm = TRUE)
+    q_vals <- stats::quantile(x, probs = c(0.25, 0.75), na.rm = TRUE)
+    Q1 <- q_vals[1]
+    Q3 <- q_vals[2]
     IQR_val <- Q3 - Q1
     lower_bound <- Q1 - 1.5 * IQR_val
     upper_bound <- Q3 + 1.5 * IQR_val
@@ -96,8 +97,8 @@ Exploratory_Data_analysis <- function(data, target_name = "Potability") {
   eda_results$Outlier_Counts <- sapply(numeric_data, detect_outliers_iqr)
 
   # 7. Print brief summary
-  cat("=== Exploratory Data Analysis ===\n")
-  cat("Data Source: Unnormalized Training Set\n")
+  message("=== Exploratory Data Analysis ===")
+  message("Data Source: Unnormalized Training Set")
 
   # 7.1 Basic Information
   cat("\n[1] Dataset Overview\n")
@@ -117,10 +118,11 @@ Exploratory_Data_analysis <- function(data, target_name = "Potability") {
 
   # 7.4 Group Means Analysis
   cat("\n[4] Feature Means Grouped By Target (", target_name, ")\n", sep = "")
-  print(as.data.frame(
-    eda_results$Group_Means %>%
-      mutate(across(where(is.numeric), ~ round(.x, 3)))
-  ), row.names = FALSE)
+
+  formatted_means <- eda_results$Group_Means %>%
+    dplyr::mutate(dplyr::across(dplyr::where(is.numeric), ~ round(.x, 3)))
+
+  print(as.data.frame(formatted_means), row.names = FALSE)
 
   return(eda_results)
 }
