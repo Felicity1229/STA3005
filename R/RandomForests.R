@@ -7,8 +7,6 @@
 #'
 #' @name random_forest_model
 #' @author ZHANG Yibing
-#' @version 1.0
-#' @date 2026-05-03
 NULL
 
 #' Compute Gini Impurity

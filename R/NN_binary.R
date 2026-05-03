@@ -7,8 +7,6 @@
 #'
 #' @name neural_network
 #' @author LI Zijin
-#' @version 1.0
-#' @date 2026-05-03
 NULL
 
 #' Get Layer Sizes of Neural Network

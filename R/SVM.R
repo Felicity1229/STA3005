@@ -6,8 +6,6 @@
 #'
 #' @name svm_model
 #' @author ZHANG Yibing
-#' @version 1.0
-#' @date 2026-05-03
 NULL
 
 #' Train SVM Model with Optional Hyperparameter Tuning
