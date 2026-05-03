@@ -153,7 +153,7 @@ train_xgb <- function(X_train, y_train, X_test, y_test) {
   # Calculate and display feature importance
   imp <- xgb.importance(model = model)
 
-  cat("\nFeature Importance：\n")
+  cat("\nFeature Importance:\n")
   print(imp)
 
   # Return results in standard format

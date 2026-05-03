@@ -26,9 +26,9 @@ It also generates visualizations, including an ROC curve and a Confusion Matrix 
 \examples{
 \dontrun{
 # Assuming 'dtr_result' is the output from decision_tree()
-evaluation_df <- evaluate_model(true_labels = y_test,
-                                model_result = dtr_result,
-                                positive_class = "X1")
+evaluation_df <- evaluate_models(true_labels = y_test,
+                                 model_result = dtr_result,
+                                 positive_class = "1")
 }
 }
 \author{

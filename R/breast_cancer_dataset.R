@@ -27,4 +27,4 @@
 #'   \item{Status}{Binary target variable: 1 = Alive, 0 = Dead}
 #' }
 #' @source \url{https://www.kaggle.com/datasets/alaahussien/breast-canser}
-"breast_cancer_data"
+"breast_cancer_dataset"

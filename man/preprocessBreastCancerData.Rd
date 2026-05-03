@@ -10,8 +10,6 @@ preprocessBreastCancerData(file_path, train_ratio = 0.8)
 \item{file_path}{Path to the Breast_Cancer.csv file}
 
 \item{train_ratio}{Proportion of data to use for training (default: 0.8)}
-
-\item{seed}{Random seed for reproducibility (default: 3005)}
 }
 \value{
 A list containing:

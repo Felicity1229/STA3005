@@ -29,8 +29,8 @@ Default is NULL.}
 "linear", "polynomial", or "sigmoid".}
 
 \item{tune}{Logical indicating whether to perform hyperparameter tuning
-using 5-fold cross-validation. If TRUE, searches over cost = {0.1,1,10}
-and gamma = {0.01,0.1,1}. Default is TRUE.}
+using 5-fold cross-validation. If TRUE, searches over cost = c(0.1,1,10)
+and gamma = c(0.01,0.1,1). Default is TRUE.}
 }
 \value{
 A list containing:

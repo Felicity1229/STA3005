@@ -33,4 +33,4 @@
 #'   \item{habitat}{Environment where found: g = grasses, l = leaves, m = meadows, p = paths, u = urban, w = waste, d = woods}
 #' }
 #' @source \url{https://www.kaggle.com/datasets/uciml/mushroom-classification}
-"mushroom_data"
+"mushroom_dataset"

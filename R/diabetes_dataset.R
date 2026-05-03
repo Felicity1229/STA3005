@@ -18,4 +18,4 @@
 #'   \item{Outcome}{Binary target variable: 1 = Patient has diabetes, 0 = Patient does not have diabetes.}
 #' }
 #' @source \url{https://www.kaggle.com/code/melikedilekci/diabetes-dataset-for-beginners}
-"diabetes_data"
+"diabetes_dataset"

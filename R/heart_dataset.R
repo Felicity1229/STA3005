@@ -22,4 +22,4 @@
 #'   \item{target}{Target variable indicating heart disease status: 0 = no disease, 1 = presence of disease}
 #' }
 #' @source \url{https://www.kaggle.com/code/farzadnekouei/heart-disease-prediction/input}
-"heart_data"
+"heart_dataset"

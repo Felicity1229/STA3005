@@ -168,7 +168,7 @@ computeCost <- function(X, y, cache) {
   n0 <- sum(y == 0)
   n1 <- sum(y == 1)
   if (n0 == 0 || n1 == 0) {
-    warning("missing category，using equal weights")
+    warning("missing category, using equal weights")
     weights <- rep(1, m)
   } else {
     w0 <- 1 / n0
