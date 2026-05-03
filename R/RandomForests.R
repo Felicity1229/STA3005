@@ -162,7 +162,7 @@ rf_predict_tree <- function(tree, x) {
 #' @return A list of decision trees (length = n_trees)
 #'
 #' @export
-train_rf_scratch <- function(X, y, n_trees = 20, max_depth = 5) {
+train_rf <- function(X, y, n_trees = 20, max_depth = 5) {
 
   trees <- list()
 
@@ -186,7 +186,7 @@ train_rf_scratch <- function(X, y, n_trees = 20, max_depth = 5) {
 #' Makes predictions for test data using a trained random forest. Returns
 #' both the majority vote class and the probability of belonging to class 1.
 #'
-#' @param trees List of decision trees from \code{\link{train_rf_scratch}}
+#' @param trees List of decision trees from \code{\link{train_rf}}
 #' @param X Test feature data frame. Each row is a sample.
 #' @return A list containing:
 #'   \item{model_name}{Character string "Random Forest"}
@@ -195,7 +195,7 @@ train_rf_scratch <- function(X, y, n_trees = 20, max_depth = 5) {
 #'   \item{model}{The trained random forest model (list of trees)}
 #'
 #' @export
-predict_rf <- function(trees, X) {
+predict_rf_model <- function(trees, X) {
   results <- lapply(1:nrow(X), function(i){
 
     votes <- sapply(trees, function(tree) {
@@ -264,14 +264,14 @@ evaluate_rf_model <- function(y_true, y_pred) {
 
 # Example usage (commented out)
 
-# rf_scratch <- train_rf_scratch(
+# rf_scratch <- train_rf(
 #   X = result$X_train_norm,
 #   y = result$y_train,
 #   n_trees = 20,
 #   max_depth = 5
 # )
 #
-# rf_result <- predict_rf(rf_scratch, result$X_test_norm)
+# rf_result <- predict_rf_model(rf_scratch, result$X_test_norm)
 #
 # predictions <- rf_result$predictions
 # pred_prob   <- rf_result$pred_prob

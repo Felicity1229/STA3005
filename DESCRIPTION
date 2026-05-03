@@ -26,7 +26,10 @@ Imports:
     randomForest,
     xgboost,
     caret,
-    pROC
+    pROC,
+    GGally,
+    caTools,
+    rpart.plot
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Suggests: 

@@ -50,14 +50,14 @@ NULL
 #' y_test <- sample(0:1, 20, replace = TRUE)
 #'
 #' # Train with tuning
-#' result <- train_svm_model(X_train, y_train, X_test, y_test, tune = TRUE)
+#' result <- train_svm(X_train, y_train, X_test, y_test, tune = TRUE)
 #'
 #' # Make predictions manually
 #' pred_class <- result$predictions
 #' pred_prob <- result$pred_prob
 #' }
 #' @export
-train_svm_model <- function(X_train, y_train,
+train_svm <- function(X_train, y_train,
                             X_test = NULL, y_test = NULL,
                             kernel_type = "radial",
                             tune = TRUE) {
@@ -133,7 +133,7 @@ train_svm_model <- function(X_train, y_train,
 
 # Example usage (commented out)
 
-# svm_result <- train_svm_model(
+# svm_result <- train_svm(
 #   X_train = result$X_train,
 #   y_train = result$y_train,
 #   X_test  = result$X_test,

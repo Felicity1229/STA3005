@@ -46,7 +46,7 @@ NULL
 #' result <- preprocess_data("Breast_Cancer.csv", tag_column = 1)
 #'
 #' # Train XGBoost model
-#' xgb_result <- train_xgb_full(
+#' xgb_result <- train_xgb(
 #'   X_train = result$X_train_norm,
 #'   y_train = result$y_train,
 #'   X_test  = result$X_test_norm,
@@ -59,7 +59,7 @@ NULL
 #' importance  <- xgb_result$importance
 #' }
 #' @export
-train_xgb_full <- function(X_train, y_train, X_test, y_test) {
+train_xgb <- function(X_train, y_train, X_test, y_test) {
 
   # Convert input data to matrix format
   X_train <- as.matrix(X_train)
@@ -171,7 +171,7 @@ train_xgb_full <- function(X_train, y_train, X_test, y_test) {
 
 # result <- preprocess_data("Breast_Cancer.csv", tag_column = 1, split_ratio = 0.7)
 #
-# xgb_result <- train_xgb_full(
+# xgb_result <- train_xgb(
 #   X_train = result$X_train_norm,
 #   y_train = result$y_train,
 #   X_test  = result$X_test_norm,

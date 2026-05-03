@@ -4,7 +4,7 @@
 #' missing value imputation, correlation analysis, train-test splitting,
 #' and Min-Max normalization. Designed for binary classification tasks.
 #'
-#' @name preprocess_data
+#' @name pre_process_data
 #' @author ZHANG Yibing
 NULL
 
@@ -43,7 +43,7 @@ NULL
 #' @examples
 #' \dontrun{
 #' # Preprocess diabetes dataset
-#' result <- preprocess_data("diabetes.csv", tag_column = 9, split_ratio = 0.7, seed = 3)
+#' result <- pre_process_data("diabetes.csv", tag_column = 9, split_ratio = 0.7, seed = 3)
 #'
 #' # Access preprocessed data
 #' X_train <- result$X_train_norm
@@ -52,7 +52,7 @@ NULL
 #' y_test <- result$y_test
 #' }
 #' @export
-preprocess_data <- function(file_path, tag_column, split_ratio = 0.7, seed = 3) {
+pre_process_data <- function(file_path, tag_column, split_ratio = 0.7, seed = 3) {
   # 1. Load and explore data
   # Read CSV file into data frame
   df <- read.csv(file_path)
@@ -181,7 +181,7 @@ preprocess_data <- function(file_path, tag_column, split_ratio = 0.7, seed = 3) 
 # Example usage (commented out)
 
 # file_path = "diabetes.csv"
-# result <- preprocess_data(file_path, tag_column = 9, split_ratio = 0.7, seed = 3)
+# result <- pre_process_data(file_path, tag_column = 9, split_ratio = 0.7, seed = 3)
 #
 # # Access preprocessed data
 # X_train <- result$X_train_norm
