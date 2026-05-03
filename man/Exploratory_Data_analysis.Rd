@@ -36,3 +36,6 @@ eda_results <- Exploratory_Data_analysis(data = result$train_data)
 print(eda_results$Descriptive_Statistics)
 }
 }
+\author{
+Xinyi Hu
+}
