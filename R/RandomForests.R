@@ -18,9 +18,9 @@ NULL
 #' @return Gini impurity value. Lower values indicate purer nodes.
 #'
 #' @examples
-#' gini_impurity(c(1,1,1,0,0))  # Returns 0.48
+#' rf_gini_impurity(c(1,1,1,0,0))  # Returns 0.48
 #' @export
-gini_impurity <- function(y) {
+rf_gini_impurity <- function(y) {
   p <- table(y) / length(y)
   return(1 - sum(p^2))
 }
@@ -38,7 +38,7 @@ gini_impurity <- function(y) {
 #'   \item{value}{Threshold value for the best split}
 #'
 #' @export
-best_split <- function(X, y, mtry) {
+rf_best_split <- function(X, y, mtry) {
 
   features <- sample(colnames(X), mtry)  # Randomly select features
 
@@ -58,8 +58,8 @@ best_split <- function(X, y, mtry) {
       # Skip splits that don't separate the data
       if (sum(left_idx) == 0 || sum(right_idx) == 0) next
 
-      gini_left  <- gini_impurity(y[left_idx])
-      gini_right <- gini_impurity(y[right_idx])
+      gini_left  <- rf_gini_impurity(y[left_idx])
+      gini_right <- rf_gini_impurity(y[right_idx])
 
       # Weighted Gini impurity
       gini_total <- (sum(left_idx)/length(y)) * gini_left +
@@ -96,7 +96,7 @@ best_split <- function(X, y, mtry) {
 #'   \item{right}{Right child subtree}
 #'
 #' @export
-build_tree <- function(X, y, depth = 0, max_depth = 5, mtry = NULL) {
+rf_build_tree <- function(X, y, depth = 0, max_depth = 5, mtry = NULL) {
 
   # Stopping criteria: pure node or max depth reached
   if (length(unique(y)) == 1 || depth >= max_depth) {
@@ -108,7 +108,7 @@ build_tree <- function(X, y, depth = 0, max_depth = 5, mtry = NULL) {
     mtry <- floor(sqrt(ncol(X)))
   }
 
-  split <- best_split(X, y, mtry)
+  split <- rf_best_split(X, y, mtry)
 
   # If no valid split found, create leaf node
   if (is.null(split$feature)) {
@@ -122,8 +122,8 @@ build_tree <- function(X, y, depth = 0, max_depth = 5, mtry = NULL) {
   return(list(
     feature = split$feature,
     value = split$value,
-    left = build_tree(X[left_idx, ], y[left_idx], depth + 1, max_depth, mtry),
-    right = build_tree(X[right_idx, ], y[right_idx], depth + 1, max_depth, mtry)
+    left = rf_build_tree(X[left_idx, ], y[left_idx], depth + 1, max_depth, mtry),
+    right = rf_build_tree(X[right_idx, ], y[right_idx], depth + 1, max_depth, mtry)
   ))
 }
 
@@ -132,21 +132,21 @@ build_tree <- function(X, y, depth = 0, max_depth = 5, mtry = NULL) {
 #'
 #' Traverses a decision tree to make a prediction for a single sample.
 #'
-#' @param tree A decision tree object from \code{\link{build_tree}}
+#' @param tree A decision tree object from \code{\link{rf_build_tree}}
 #' @param x A single-row data frame or named vector of features
 #' @return Predicted class label (0 or 1)
 #'
 #' @export
-predict_tree <- function(tree, x) {
+rf_predict_tree <- function(tree, x) {
 
   if (!is.null(tree$label)) {
     return(tree$label)
   }
 
   if (x[[tree$feature]] <= tree$value) {
-    return(predict_tree(tree$left, x))
+    return(rf_predict_tree(tree$left, x))
   } else {
-    return(predict_tree(tree$right, x))
+    return(rf_predict_tree(tree$right, x))
   }
 }
 
@@ -173,7 +173,7 @@ train_rf_scratch <- function(X, y, n_trees = 20, max_depth = 5) {
     X_sample <- X[idx, ]
     y_sample <- y[idx]
 
-    tree <- build_tree(X_sample, y_sample, max_depth = max_depth)
+    tree <- rf_build_tree(X_sample, y_sample, max_depth = max_depth)
 
     trees[[i]] <- tree
   }
@@ -199,7 +199,7 @@ predict_rf <- function(trees, X) {
   results <- lapply(1:nrow(X), function(i){
 
     votes <- sapply(trees, function(tree) {
-      predict_tree(tree, X[i, ])
+      rf_predict_tree(tree, X[i, ])
     })
 
     vote_table <- table(votes)
@@ -238,9 +238,9 @@ predict_rf <- function(trees, X) {
 #' @examples
 #' y_true <- c(1,1,0,0,1,0)
 #' y_pred <- c(1,0,0,0,1,1)
-#' evaluate_model(y_true, y_pred)
+#' evaluate_rf_model(y_true, y_pred)
 #' @export
-evaluate_model <- function(y_true, y_pred) {
+evaluate_rf_model <- function(y_true, y_pred) {
 
   cm <- table(Predicted = y_pred, Actual = y_true)
   print(cm)
@@ -276,5 +276,5 @@ evaluate_model <- function(y_true, y_pred) {
 # predictions <- rf_result$predictions
 # pred_prob   <- rf_result$pred_prob
 #
-# evaluate_model(result$y_test, predictions)
+# evaluate_rf_model(result$y_test, predictions)
 # head(pred_prob)
