@@ -12,7 +12,6 @@
 #'
 #' @param file_path Path to the Breast_Cancer.csv file
 #' @param train_ratio Proportion of data to use for training (default: 0.8)
-#' @param seed Random seed for reproducibility (default: 3005)
 #' @return A list containing:
 #'   \item{X_train}{Training feature matrix (features as rows, samples as columns)}
 #'   \item{y_train}{Training labels (1 row, samples as columns)}

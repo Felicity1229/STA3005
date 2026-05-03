@@ -31,8 +31,8 @@ NULL
 #' @param kernel_type Kernel type for SVM. Options: "radial" (default),
 #'        "linear", "polynomial", or "sigmoid".
 #' @param tune Logical indicating whether to perform hyperparameter tuning
-#'        using 5-fold cross-validation. If TRUE, searches over cost = {0.1,1,10}
-#'        and gamma = {0.01,0.1,1}. Default is TRUE.
+#'        using 5-fold cross-validation. If TRUE, searches over cost = c(0.1,1,10)
+#'        and gamma = c(0.01,0.1,1). Default is TRUE.
 #' @return A list containing:
 #'   \item{model_name}{Character string "SVM"}
 #'   \item{predictions}{Factor vector of predicted classes (0/1) for test data}

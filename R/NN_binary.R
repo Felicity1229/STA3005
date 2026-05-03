@@ -63,7 +63,7 @@ initializeParameters <- function(X, list_layer_size){
   n_h <- list_layer_size$n_h
   n_y <- list_layer_size$n_y
 
-  # Xavier初始化
+  # Xavier initialization
   W1 <- matrix(rnorm(n_h * n_x, 0, sqrt(2/(n_x + n_h))), nrow = n_h, ncol = n_x)
   b1 <- matrix(0, nrow = n_h, ncol = 1)
   W2 <- matrix(rnorm(n_y * n_h, 0, sqrt(2/(n_h + n_y))), nrow = n_y, ncol = n_h)
@@ -110,7 +110,7 @@ sigmoid <- function(x){
 #' cache <- forwardPropagation(X, params, layer_info)
 #' @export
 forwardPropagation <- function(X, params, list_layer_size){
-  m <- ncol(X)  # 样本数
+  m <- ncol(X)  # sample number
   n_h <- list_layer_size$n_h
   n_y <- list_layer_size$n_y
 
@@ -120,7 +120,7 @@ forwardPropagation <- function(X, params, list_layer_size){
   b2 <- params$b2
 
   if(ncol(b1) == 1) {
-    b1_expanded <- b1[, rep(1, m)]  # 扩展为 [n_h, m]
+    b1_expanded <- b1[, rep(1, m)]  # extend to [n_h, m]
   } else {
     b1_expanded <- b1
   }
@@ -131,7 +131,7 @@ forwardPropagation <- function(X, params, list_layer_size){
     b2_expanded <- b2
   }
 
-  # 广播bias
+  # broadcast bias
   Z1 <- W1 %*% X + b1_expanded
   A1 <- sigmoid(Z1)
   Z2 <- W2 %*% A1 + b2_expanded
@@ -168,7 +168,7 @@ computeCost <- function(X, y, cache) {
   n0 <- sum(y == 0)
   n1 <- sum(y == 1)
   if (n0 == 0 || n1 == 0) {
-    warning("类别缺失，使用等权重")
+    warning("missing category，using equal weights")
     weights <- rep(1, m)
   } else {
     w0 <- 1 / n0
@@ -207,7 +207,6 @@ backwardPropagation <- function(X, y, cache, params, list_layer_size, use_weight
   A1 <- cache$A1
   W2 <- params$W2
 
-  # 计算权重（用于反向传播）
   if(use_weights) {
     n0 <- sum(y == 0)
     n1 <- sum(y == 1)
@@ -221,13 +220,10 @@ backwardPropagation <- function(X, y, cache, params, list_layer_size, use_weight
     weights <- rep(1, m)
   }
 
-  # 输出层梯度（加权）
+
   dZ2 <- (A2 - y) * weights
   dW2 <- (1/m) * (dZ2 %*% t(A1))
   db2 <- (1/m) * rowSums(dZ2)
-
-  # 隐藏层梯度 - 修复这里！
-  # 使用 sigmoid 的导数：A1 * (1 - A1)
   dZ1 <- (t(W2) %*% dZ2) * (A1 * (1 - A1))
   dW1 <- (1/m) * (dZ1 %*% t(X))
   db1 <- (1/m) * rowSums(dZ1)
