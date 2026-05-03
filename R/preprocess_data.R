@@ -6,8 +6,6 @@
 #'
 #' @name preprocess_data
 #' @author ZHANG Yibing
-#' @version 1.0
-#' @date 2026-05-03
 NULL
 
 #' Preprocess Data for Model Training and Evaluation

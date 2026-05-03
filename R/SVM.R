@@ -6,8 +6,6 @@
 #'
 #' @name svm_model
 #' @author ZHANG Yibing
-#' @version 1.0
-#' @date 2026-05-03
 NULL
 
 #' Train SVM Model with Optional Hyperparameter Tuning
@@ -59,9 +57,6 @@ NULL
 #' pred_prob <- result$pred_prob
 #' }
 #' @export
-
-library(e1071)
-
 train_svm_model <- function(X_train, y_train,
                             X_test = NULL, y_test = NULL,
                             kernel_type = "radial",

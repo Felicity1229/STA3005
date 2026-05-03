@@ -7,8 +7,6 @@
 #'
 #' @name xgboost_model
 #' @author ZHANG Yibing
-#' @version 1.0
-#' @date 2026-05-03
 NULL
 
 #' Train XGBoost Model for Binary Classification
@@ -61,10 +59,6 @@ NULL
 #' importance  <- xgb_result$importance
 #' }
 #' @export
-
-# Load required libraries
-library(xgboost)
-
 train_xgb_full <- function(X_train, y_train, X_test, y_test) {
 
   # Convert input data to matrix format
