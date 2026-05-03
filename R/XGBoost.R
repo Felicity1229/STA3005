@@ -93,7 +93,7 @@ train_xgb_full <- function(X_train, y_train, X_test, y_test) {
 
   return(list(
     model = model,
-    auc = auc(roc_obj),
+    # auc = auc(roc_obj),
     best_threshold = th$best_threshold,
     importance = imp
   ))
