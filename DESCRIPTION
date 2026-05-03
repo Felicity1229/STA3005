@@ -1,6 +1,6 @@
-Package: aquaGuard
+Package: ClassifyR
 Type: Package
-Title: Predictive Modeling and Explanatory Data Analysis for Water Potability
+Title: Binary Classification Ensemble with Five Machine Learning Algorithms
 Version: 0.1.0
 Authors@R: 
     c(
@@ -9,21 +9,30 @@ Authors@R:
       person("Zijin", "Li", email = "123090312@link.cuhk.edu.cn", role = "aut")
     )
 Maintainer: Yibing Zhang <123090837@link.cuhk.edu.cn>
-Description: A comprehensive and user-friendly R package designed for analyzing and predicting water potability. 
-    aquaGuard provides an end-to-end data science pipeline, integrating data preprocessing (handling missing values and normalization) with classification algorithms such as SVM, Decision Trees and Neural Network. 
-    Beyond basic prediction, the package emphasizes model interpretability by extracting feature importance rules. 
-    Additionally, it features advanced visualization tools, including correlation heatmaps and customized boxplots, enabling users to perform exploratory data analysis and evaluate classifier performance.
+Description: A comprehensive R package for binary classification tasks using five 
+    machine learning algorithms: Support Vector Machines (SVM), 
+    Decision Trees, Random Forest, XGBoost, and Neural Networks. The package provides 
+    an end-to-end pipeline including data preprocessing, model training, performance evaluation, and model comparison. Features include standardized 
+    evaluation metrics (accuracy, precision, recall, F1, AUC-ROC), visualization tools 
+    for model comparison, and interpretability methods (feature importance, decision rules).
 License: GPL (>= 3)
 Encoding: UTF-8
-Imports: ggplot2, stats, dplyr, rpart
+Imports: 
+    ggplot2,
+    stats,
+    dplyr,
+    rpart,
+    e1071,
+    randomForest,
+    xgboost,
+    caret,
+    pROC
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 Suggests: 
     testthat (>= 3.0.0),
-    knitr, 
-    rmarkdown
+    knitr,
+    rmarkdown,
+    rpart.plot
 Config/testthat/edition: 3
-Author: Yibing Zhang [aut, cre],
-Xinyi Hu [aut],
-Zijin Li [aut]
