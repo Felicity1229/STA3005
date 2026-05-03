@@ -1,71 +1,87 @@
-# Required packages: caret, pROC, ggplot2, reshape2
-if (!requireNamespace("pROC", quietly = TRUE)) install.packages("pROC")
-if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages("ggplot2")
-if (!requireNamespace("reshape2", quietly = TRUE)) install.packages("reshape2")
+#' Comprehensive Evaluation for a Single Model
+#'
+#' This function computes core classification metrics (Accuracy, F1-Score,
+#' Precision, Recall, AUC) for a single model's predictions against true test labels.
+#' It also generates visualizations, including an ROC curve and a Confusion Matrix Heatmap.
+#'
+#' @param true_labels A factor or numeric vector containing the actual labels of the test set.
+#' @param model_result A list containing the results of a trained model. It must
+#'   include \code{model_name}, \code{predictions} (class labels), and \code{pred_prob} (probabilities).
+#' @param positive_class A character string representing the positive class level
+#'   in the target variable (e.g., "1", "Yes", or "X1").
+#'
+#' @return A data frame containing the computed evaluation metrics.
+#'
+#' @import caret
+#' @import pROC
+#' @import ggplot2
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Assuming 'dtr_result' is the output from decision_tree()
+#' evaluation_df <- evaluate_model(true_labels = y_test,
+#'                                 model_result = dtr_result,
+#'                                 positive_class = "X1")
+#' }
+evaluate_models <- function(true_labels, model_result, positive_class) {
 
-library(caret)
-library(pROC)
-library(ggplot2)
-library(reshape2)
-
-#' Comprehensive Evaluation and Comparison for Multiple Models
-#' @param true_labels The actual labels of the test set (factor)
-#' @param models_results A list of results from different models
-#' @param positive_class The string representing the positive class (e.g., "1" or "Yes")
-evaluate_models <- function(true_labels, models_results, positive_class) {
-
-  # Initialize an empty dataframe to store metrics
-  metrics_df <- data.frame(
-    Model = character(),
-    Accuracy = numeric(),
-    F1_Score = numeric(),
-    Precision = numeric(),
-    Recall = numeric(),
-    AUC = numeric(),
-    stringsAsFactors = FALSE
-  )
-
-  roc_list <- list() # Store ROC objects for plotting
-
-  # 1. Loop through each model to calculate metrics
+  # 1. Extract inputs
   labels_factor <- factor(true_labels, levels = c("0", "1"))
-  name <- models_results$model_name
-  pred_c <- models_results$predictions
-  pred_p <- models_results$pred_prob
+  name <- model_result$model_name
+  pred_c <- model_result$predictions
+  pred_p <- model_result$pred_prob
 
-  # Calculate Confusion Matrix (mode="everything" gives F1, Precision, Recall)
+  # 2. Calculate Confusion Matrix
   cm <- confusionMatrix(pred_c, labels_factor, positive = positive_class, mode = "everything")
 
-  # Calculate ROC and AUC
+  # 3. Calculate ROC and AUC
   roc_obj <- roc(labels_factor, pred_p, quiet = TRUE)
   auc_val <- as.numeric(auc(roc_obj))
-  roc_list[[name]] <- roc_obj
 
-  # Append to dataframe
-  metrics_df <- rbind(metrics_df, data.frame(
+  # 4. Store Metrics
+  metrics_df <- data.frame(
     Model = name,
     Accuracy = cm$overall["Accuracy"],
     F1_Score = cm$byClass["F1"],
     Precision = cm$byClass["Precision"],
     Recall = cm$byClass["Recall"],
-    AUC = auc_val
-  ))
+    AUC = auc_val,
+    stringsAsFactors = FALSE
+  )
 
-
-  print("===== Multi-Model Comparison Metrics =====")
+  print(paste("===== Evaluation Metrics for", name, "====="))
   print(metrics_df)
 
-  # 2. Plot 1: Overlay ROC Curves for all models
-  print("Generating combined ROC Curve...")
-  plot(roc_list[[1]], col = 1, main = "ROC Curve Comparison", lwd = 2)
-  if (length(roc_list) > 1) {
-    for (i in 2:length(roc_list)) {
-      plot(roc_list[[i]], col = i, add = TRUE, lwd = 2)
-    }
-  }
-  legend("bottomright", legend = names(roc_list), col = 1:length(roc_list), lwd = 2)
+  # 5. Plot 1: ROC Curve
+  print("Generating ROC Curve...")
+  plot(roc_obj, col = "darkblue", main = paste("ROC Curve -", name), lwd = 2)
+  text(x = 0.2, y = 0.2, labels = paste("AUC =", round(auc_val, 4)), col = "darkblue", cex = 1.2, font = 2)
 
-  # 3. Plot 2: Bar Chart for Metrics Comparison (Acc, F1, AUC)
+  # 6. Plot 2: Confusion Matrix Heatmap
+  print("Generating Confusion Matrix Heatmap...")
+  cm_table <- as.data.frame(cm$table)
+  colnames(cm_table) <- c("Prediction", "Reference", "Freq")
+
+  heatmap_plot <- ggplot(cm_table, aes(x = Reference, y = Prediction, fill = Freq)) +
+    geom_tile(color = "white") +
+    geom_text(aes(label = Freq), vjust = 0.5, fontface = "bold", size = 6) +
+    scale_fill_gradient(low = "#F0F8FF", high = "#4682B4") +
+    theme_minimal() +
+    labs(
+      title = paste("Confusion Matrix Heatmap -", name),
+      x = "Actual Class (Reference)",
+      y = "Predicted Class"
+    ) +
+    theme(
+      plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+      axis.title = element_text(face = "bold"),
+      axis.text = element_text(size = 12)
+    )
+
+  print(heatmap_plot)
+
+  # 3. Plot 3: Bar Chart for Metrics (Acc, F1, AUC)
   print("Generating Metrics Bar Chart...")
   # Melt dataframe for ggplot
   melted_df <- melt(metrics_df, id.vars = "Model",
@@ -74,17 +90,13 @@ evaluate_models <- function(true_labels, models_results, positive_class) {
   bar_plot <- ggplot(melted_df, aes(x = Model, y = value, fill = variable)) +
     geom_bar(stat = "identity", position = "dodge", width = 0.7) +
     theme_minimal() +
-    labs(title = "Model Performance Comparison", y = "Score", x = "Models") +
+    labs(title = paste("Performance Metrics -", name), y = "Score", x = "Metrics") +
     scale_fill_brewer(palette = "Set2") +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 
   print(bar_plot)
 
   return(metrics_df)
 }
 
-evaluate_models(y_test, NN, "1")
-evaluate_models(y_test, svm_result, "1")
-evaluate_models(y_test, rf_result, "1")
-evaluate_models(y_test, xgb_result, "1")
-
+evaluate_models(y_test, dtr_result, "1")

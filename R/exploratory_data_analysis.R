@@ -31,20 +31,20 @@
 
 Exploratory_Data_analysis <- function(data, target_name = "Potability") {
 
-  # 1. 参数校验
+  # 1. Parameter Validation
   if (!(target_name %in% colnames(data))) {
     stop(paste("Error: Target column '", target_name, "' not found in the dataset.", sep = ""))
   }
 
-  # 初始化一个列表，用于存储并返回所有的探索性分析结果
+  # Initialize a list to store and return all exploratory analysis results
   eda_results <- list()
 
-  # 2. 基础信息提取
+  # 2. Extract Basic Information
   eda_results$Dimensions <- dim(data)
   numeric_data <- data %>%
     select(where(is.numeric))
 
-  # 3. 详细的描述性统计 (Descriptive Statistics)
+  # 3. Detailed Descriptive Statistics
   calc_stats <- function(x) {
     c(
       Min = min(x, na.rm = TRUE),
@@ -57,10 +57,10 @@ Exploratory_Data_analysis <- function(data, target_name = "Potability") {
     )
   }
 
-  # 转置为矩阵格式
+  # Transpose to matrix format
   eda_results$Descriptive_Statistics <- t(sapply(numeric_data, calc_stats))
 
-  # 4. 目标变量分布 (Target Variable Distribution)
+  # 4. Target Variable Distribution
   target_vector <- data[[target_name]]
   counts <- table(target_vector)
   props <- prop.table(counts) * 100
@@ -72,14 +72,14 @@ Exploratory_Data_analysis <- function(data, target_name = "Potability") {
   )
   eda_results$Target_Distribution <- dist_df
 
-  # 5. 分组均值分析 (Group Means by Target)
+  # 5. Group Means by Target
   group_means <- data %>%
     group_by(.data[[target_name]]) %>%
     summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)))
   colnames(group_means)[1] <- target_name
   eda_results$Group_Means <- group_means
 
-  # 6. 离群值检测 (Outlier Detection using IQR method)
+  # 6. Outlier Detection using IQR method
   detect_outliers_iqr <- function(x) {
     Q1 <- quantile(x, 0.25, na.rm = TRUE)
     Q3 <- quantile(x, 0.75, na.rm = TRUE)
@@ -93,27 +93,27 @@ Exploratory_Data_analysis <- function(data, target_name = "Potability") {
 
   eda_results$Outlier_Counts <- sapply(numeric_data, detect_outliers_iqr)
 
-  # 7. 打印简要总结
+  # 7. Print brief summary
   cat("=== Exploratory Data Analysis ===\n")
   cat("Data Source: Unnormalized Training Set\n")
 
-  # 7.1 基础信息
+  # 7.1 Basic Information
   cat("\n[1] Dataset Overview\n")
   cat("Total Observations :", eda_results$Dimensions[1], "\n")
   cat("Total Features     :", eda_results$Dimensions[2] - 1, "(excluding target)\n")
   cat("Target Variable    :", target_name, "\n")
 
-  # 7.2 目标变量分布
+  # 7.2 Target Variable Distribution
   cat("\n[2] Target Variable Distribution\n")
   print(eda_results$Target_Distribution, row.names = FALSE)
 
-  # 7.3 描述性统计与离群值
+  # 7.3 Descriptive Statistics & Outliers
   cat("\n[3] Descriptive Statistics & Outliers\n")
   stats_with_outliers <- cbind(eda_results$Descriptive_Statistics,
                                Outliers = eda_results$Outlier_Counts)
   print(round(stats_with_outliers, 3))
 
-  # 7.4 分组均值分析
+  # 7.4 Group Means Analysis
   cat("\n[4] Feature Means Grouped By Target (", target_name, ")\n", sep = "")
   print(as.data.frame(
     eda_results$Group_Means %>%
