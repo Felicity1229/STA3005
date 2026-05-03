@@ -21,6 +21,8 @@
 #'   \item \code{model_name}: A character string indicating the model name ("Decision Tree").
 #' }
 #'
+#' @author Xinyi Hu
+#'
 #' @import caret
 #' @import rpart
 #' @import rpart.plot
@@ -105,5 +107,3 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
     model_name = "Decision Tree"
   ))
 }
-
-dtr_result = decision_tree(X_train, y_train, X_test, y_test, cp = 0.01)

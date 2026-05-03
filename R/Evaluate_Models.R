@@ -12,6 +12,8 @@
 #'
 #' @return A data frame containing the computed evaluation metrics.
 #'
+#' @author Xinyi Hu
+#'
 #' @import caret
 #' @import pROC
 #' @import ggplot2
@@ -98,5 +100,3 @@ evaluate_models <- function(true_labels, model_result, positive_class) {
 
   return(metrics_df)
 }
-
-evaluate_models(y_test, dtr_result, "1")

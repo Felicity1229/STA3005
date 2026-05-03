@@ -17,6 +17,8 @@
 #'   \item \code{Outlier_Counts}: The number of outliers in each numeric feature based on the IQR method.
 #' }
 #'
+#' @author Xinyi Hu
+#'
 #' @import dplyr
 #' @export
 #'
