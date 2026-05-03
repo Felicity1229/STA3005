@@ -29,8 +29,10 @@
 #'
 #' @importFrom caret confusionMatrix
 #' @importFrom pROC roc ggroc auc
-#' @importFrom ggplot2 ggplot aes geom_tile geom_text scale_fill_gradient theme_minimal labs theme element_text facet_wrap geom_abline ggtitle geom_bar scale_fill_brewer
+#' @importFrom ggplot2 ggplot aes geom_tile geom_text scale_fill_gradient theme_minimal labs theme element_text facet_wrap geom_abline ggtitle geom_bar scale_fill_brewer element_rect
 #' @importFrom reshape2 melt
+#' @importFrom stats factor
+#' @importFrom methods as
 #' @export
 #'
 #' @examples
