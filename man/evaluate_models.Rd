@@ -31,3 +31,6 @@ evaluation_df <- evaluate_model(true_labels = y_test,
                                 positive_class = "X1")
 }
 }
+\author{
+Xinyi Hu
+}
