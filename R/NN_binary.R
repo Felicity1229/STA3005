@@ -1,5 +1,33 @@
-set.seed(3005)
+#' Neural Network for Binary Classification
+#'
+#' A collection of functions to build, train, and evaluate a single-hidden-layer
+#' neural network for binary classification tasks. Features include Xavier
+#' parameter initialization, forward/backward propagation, and weighted loss
+#' function for imbalanced data.
+#'
+#' @name neural_network
+#' @author LI Zijin
+#' @version 1.0
+#' @date 2026-05-03
+NULL
 
+#' Get Layer Sizes of Neural Network
+#'
+#' Determines the number of neurons in each layer based on input and output dimensions.
+#'
+#' @param X Input feature matrix. Each column is a sample, each row is a feature.
+#' @param y Output label matrix. For binary classification, this has 1 row.
+#' @param hidden_neurons Number of neurons in the hidden layer.
+#' @return A list containing:
+#'   \item{n_x}{Number of input neurons (feature dimension)}
+#'   \item{n_h}{Number of hidden neurons}
+#'   \item{n_y}{Number of output neurons}
+#'
+#' @examples
+#' X <- matrix(rnorm(100), nrow = 5, ncol = 20)
+#' y <- matrix(sample(0:1, 20, replace = TRUE), nrow = 1)
+#' layer_sizes <- getLayerSize(X, y, hidden_neurons = 4)
+#' @export
 getLayerSize <- function(X, y, hidden_neurons) {
   # To generate matrices with random parameters, we need to first obtain the size
   # (number of neurons) of all the layers in our neural-net.
@@ -14,6 +42,24 @@ getLayerSize <- function(X, y, hidden_neurons) {
   return(size)
 }
 
+#' Initialize Neural Network Parameters
+#'
+#' Initializes weight matrices using Xavier/Glorot initialization and bias
+#' vectors with zeros. Xavier variance = 2 / (n_input + n_output).
+#'
+#' @param X Input feature matrix (used to determine input dimension)
+#' @param list_layer_size List of layer sizes from \code{\link{getLayerSize}}
+#' @return A list containing the initialized parameters:
+#'   \item{W1}{Hidden layer weight matrix, dimension (n_h, n_x)}
+#'   \item{b1}{Hidden layer bias vector, dimension (n_h, 1)}
+#'   \item{W2}{Output layer weight matrix, dimension (n_y, n_h)}
+#'   \item{b2}{Output layer bias vector, dimension (n_y, 1)}
+#'
+#' @examples
+#' X <- matrix(rnorm(100), nrow = 5)
+#' layer_info <- list(n_x = 5, n_h = 4, n_y = 1)
+#' params <- initializeParameters(X, layer_info)
+#' @export
 initializeParameters <- function(X, list_layer_size){
   n_x <- list_layer_size$n_x
   n_h <- list_layer_size$n_h
@@ -28,12 +74,43 @@ initializeParameters <- function(X, list_layer_size){
   return(list(W1 = W1, b1 = b1, W2 = W2, b2 = b2))
 }
 
+#' Sigmoid Activation Function
+#'
+#' Applies the sigmoid function to map input values to the (0,1) range.
+#' Commonly used for binary classification output layers.
+#'
+#' @param x A numeric vector, matrix, or array
+#' @return A numeric object of the same dimension as x, with values in (0,1)
+#'
+#' @examples
+#' sigmoid(0)  # returns 0.5
+#' sigmoid(c(-1, 0, 1))
+#' @export
 sigmoid <- function(x){
   # This activation function is for the output layer
   return(1 / (1 + exp(-x)))
 }
 
-
+#' Forward Propagation
+#'
+#' Computes activations for all layers through forward propagation.
+#' Returns all intermediate values for use in backpropagation.
+#'
+#' @param X Input feature matrix, dimension (n_x, m) where m = number of samples
+#' @param params Parameter list containing W1, b1, W2, b2 from \code{\link{initializeParameters}}
+#' @param list_layer_size List of layer sizes from \code{\link{getLayerSize}}
+#' @return A list (cache) containing:
+#'   \item{Z1}{Linear output of hidden layer, dimension (n_h, m)}
+#'   \item{A1}{Hidden layer activation (sigmoid(Z1)), dimension (n_h, m)}
+#'   \item{Z2}{Linear output of output layer, dimension (n_y, m)}
+#'   \item{A2}{Output layer prediction probabilities, dimension (n_y, m)}
+#'
+#' @examples
+#' X <- matrix(rnorm(50), nrow = 5, ncol = 10)
+#' layer_info <- list(n_x = 5, n_h = 4, n_y = 1)
+#' params <- initializeParameters(X, layer_info)
+#' cache <- forwardPropagation(X, params, layer_info)
+#' @export
 forwardPropagation <- function(X, params, list_layer_size){
   m <- ncol(X)  # 样本数
   n_h <- list_layer_size$n_h
@@ -74,6 +151,17 @@ forwardPropagation <- function(X, params, list_layer_size){
 
 # We will use Binary Cross Entropy loss function (aka log loss)
 
+#' Compute Weighted Binary Cross-Entropy Cost
+#'
+#' Calculates the loss using binary cross-entropy with inverse frequency weighting
+#' to handle imbalanced datasets.
+#'
+#' @param X Input feature matrix (used to get number of samples)
+#' @param y True labels (0 or 1), dimension (1, m)
+#' @param cache Forward propagation cache from \code{\link{forwardPropagation}}
+#' @return Weighted binary cross-entropy cost (scalar)
+#'
+#' @export
 computeCost <- function(X, y, cache) {
   m <- dim(X)[2]
   A2 <- cache$A2
@@ -95,6 +183,25 @@ computeCost <- function(X, y, cache) {
   return(cost)
 }
 
+
+#' Backward Propagation
+#'
+#' Computes gradients of the loss function with respect to all parameters
+#' using the chain rule.
+#'
+#' @param X Input feature matrix, dimension (n_x, m)
+#' @param y True labels (0 or 1), dimension (1, m)
+#' @param cache Forward propagation cache from \code{\link{forwardPropagation}}
+#' @param params Parameter list containing W1, b1, W2, b2
+#' @param list_layer_size List of layer sizes from \code{\link{getLayerSize}}
+#' @param use_weights Logical, whether to apply class weights for imbalanced data
+#' @return A list containing gradients:
+#'   \item{dW1}{Gradient of hidden layer weights}
+#'   \item{db1}{Gradient of hidden layer bias}
+#'   \item{dW2}{Gradient of output layer weights}
+#'   \item{db2}{Gradient of output layer bias}
+#'
+#' @export
 backwardPropagation <- function(X, y, cache, params, list_layer_size, use_weights = TRUE) {
   m <- ncol(X)
 
@@ -130,7 +237,16 @@ backwardPropagation <- function(X, y, cache, params, list_layer_size, use_weight
   return(list(dW1 = dW1, db1 = db1, dW2 = dW2, db2 = db2))
 }
 
-
+#' Update Parameters Using Gradient Descent
+#'
+#' Updates network parameters by subtracting the gradient times the learning rate.
+#'
+#' @param grads Gradient list from \code{\link{backwardPropagation}}
+#' @param params Current parameter list
+#' @param learning_rate Step size for gradient descent
+#' @return Updated parameter list
+#'
+#' @export
 updateParameters <- function(grads, params, learning_rate) {
   params$W1 <- params$W1 - learning_rate * grads$dW1
   params$b1 <- params$b1 - learning_rate * grads$db1
@@ -142,6 +258,27 @@ updateParameters <- function(grads, params, learning_rate) {
 
 # Here we wrap out all functions above,
 # and by calling this function, our NN training starts
+
+#' Train Neural Network Model
+#'
+#' Main training function that iteratively performs forward/backward propagation
+#' and parameter updates.
+#'
+#' @param X Input feature matrix, dimension (n_x, m)
+#' @param y True labels (0 or 1), dimension (1, m)
+#' @param num_iteration Number of gradient descent iterations
+#' @param hidden_neurons Number of neurons in the hidden layer
+#' @param lr Learning rate
+#' @param verbose Logical, whether to print cost every 100 iterations
+#' @return A list containing:
+#'   \item{updated_params}{Trained parameters}
+#'   \item{cost_hist}{Vector of cost values at each iteration}
+#'
+#' @examples
+#' X <- matrix(rnorm(200), nrow = 10, ncol = 20)
+#' y <- matrix(sample(0:1, 20, replace = TRUE), nrow = 1)
+#' model <- trainModel(X, y, num_iteration = 500, hidden_neurons = 5, lr = 0.01)
+#' @export
 trainModel <- function(X, y, num_iteration, hidden_neurons, lr, verbose = TRUE) {
   layer_size <- getLayerSize(X, y, hidden_neurons)
   params <- initializeParameters(X, layer_size)
@@ -162,26 +299,38 @@ trainModel <- function(X, y, num_iteration, hidden_neurons, lr, verbose = TRUE) 
 }
 
 # Test the Model
+
+#' Make Predictions
+#'
+#' Generates prediction probabilities for new data using trained model.
+#'
+#' @param X Input feature matrix for test data
+#' @param params Trained parameters from \code{\link{trainModel}}
+#' @param hidden_neurons Number of neurons in hidden layer (must match training)
+#' @return Vector of prediction probabilities in (0,1)
+#'
+#' @export
 makePrediction <- function(X, params, hidden_neurons) {
   layer_size <- list(n_x = nrow(X), n_h = hidden_neurons, n_y = 1)
   fwd_prop <- forwardPropagation(X, params, layer_size)
   return(fwd_prop$A2)
 }
 
-# Build Confusion Matrix and calculate the metrics
-calculate_stats <- function(tb, model_name) {
-  acc <- (tb[1] + tb[4])/(tb[1] + tb[2] + tb[3] + tb[4])
-  recall <- tb[4]/(tb[4] + tb[3])
-  precision <- tb[4]/(tb[4] + tb[2])
-  f1 <- 2 * ((precision * recall) / (precision + recall))
-
-  cat(model_name, ": \n")
-  cat("\tAccuracy = ", acc*100, "%.")
-  cat("\n\tPrecision = ", precision*100, "%.")
-  cat("\n\tRecall = ", recall*100, "%.")
-  cat("\n\tF1 Score = ", f1*100, "%.\n\n")
-}
-
+#' Evaluate Model Performance
+#'
+#' Wrapper function to generate predictions and return model performance metrics.
+#'
+#' @param model_name Character string identifying the model
+#' @param test_data Test feature matrix
+#' @param train_model Trained model output from \code{\link{trainModel}}
+#' @param hidden_neurons Number of hidden neurons used in training
+#' @return A list containing:
+#'   \item{model_name}{Name of the model}
+#'   \item{predictions}{Factor vector of predicted classes (0/1)}
+#'   \item{pred_prob}{Vector of prediction probabilities}
+#'   \item{model}{The trained model object}
+#'
+#' @export
 NN_performance = function(model_name = "Neural Network",test_data,train_model,hidden_neurons){
   updated_params = train_model$updated_params
   pred_prob = makePrediction(test_data,updated_params,hidden_neurons)
