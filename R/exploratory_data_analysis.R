@@ -6,7 +6,7 @@
 #'
 #' @param data A data frame containing the unnormalized training features and target variable.
 #' @param target_name A character string naming the target variable.
-#'   The target column should be binary (0 = non-potable, 1 = potable).
+#'   The target column should be binary (e.g., 0/1, "Yes"/"No").
 #'
 #' @return A list containing the following Exploratory Data Analysis components:
 #' \itemize{
@@ -26,7 +26,7 @@
 #' @examples
 #' \dontrun{
 #' # Assuming 'result' is the list returned by preprocess_data()
-#' eda_results <- exploratory_data_analysis(data = result$train_data)
+#' eda_results <- exploratory_data_analysis(data = result$train_data, target_name = "Class")
 #'
 #' # View the descriptive statistics
 #' print(eda_results$Descriptive_Statistics)
@@ -44,7 +44,12 @@ exploratory_data_analysis <- function(data, target_name) {
   # 2. Extract Basic Information
   eda_results$Dimensions <- dim(data)
 
-  numeric_data <- select(data, where(is.numeric))
+  features_only <- data[, colnames(data) != target_name, drop = FALSE]
+  numeric_data <- select(features_only, where(is.numeric))
+
+  if (ncol(numeric_data) == 0) {
+    warning("No numeric features found in the dataset for descriptive statistics.")
+  }
 
   # 3. Detailed Descriptive Statistics
   calc_stats <- function(x) {
@@ -60,7 +65,11 @@ exploratory_data_analysis <- function(data, target_name) {
   }
 
   # Transpose to matrix format
-  eda_results$Descriptive_Statistics <- t(sapply(numeric_data, calc_stats))
+  if (ncol(numeric_data) > 0) {
+    eda_results$Descriptive_Statistics <- t(sapply(numeric_data, calc_stats))
+  } else {
+    eda_results$Descriptive_Statistics <- matrix(ncol = 7, nrow = 0)
+  }
 
   # 4. Target Variable Distribution
   target_vector <- data[[target_name]]
@@ -94,7 +103,11 @@ exploratory_data_analysis <- function(data, target_name) {
     return(sum(outliers, na.rm = TRUE))
   }
 
-  eda_results$Outlier_Counts <- sapply(numeric_data, detect_outliers_iqr)
+  if (ncol(numeric_data) > 0) {
+    eda_results$Outlier_Counts <- sapply(numeric_data, detect_outliers_iqr)
+  } else {
+    eda_results$Outlier_Counts <- numeric(0)
+  }
 
   # 7. Print brief summary
   message("=== Exploratory Data Analysis ===")
@@ -112,10 +125,13 @@ exploratory_data_analysis <- function(data, target_name) {
 
   # 7.3 Descriptive Statistics & Outliers
   cat("\n[3] Descriptive Statistics & Outliers\n")
-  stats_with_outliers <- cbind(eda_results$Descriptive_Statistics,
-                               Outliers = eda_results$Outlier_Counts)
-  num_cols <- sapply(stats_with_outliers, is.numeric)
-  print(round(stats_with_outliers[num_cols], 3))
+  if (ncol(numeric_data) > 0) {
+    stats_df <- as.data.frame(eda_results$Descriptive_Statistics)
+    stats_df$Outliers <- as.numeric(eda_results$Outlier_Counts)
+
+    stats_df[] <- lapply(stats_df, function(x) round(as.numeric(x), 3))
+    print(stats_df)
+  }
 
   # 7.4 Group Means Analysis
   cat("\n[4] Feature Means Grouped By Target (", target_name, ")\n", sep = "")
