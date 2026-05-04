@@ -4,13 +4,13 @@
 \alias{exploratory_data_analysis}
 \title{Exploratory Analysis for Datasets}
 \usage{
-exploratory_data_analysis(data, target_name = "Potability")
+exploratory_data_analysis(data, target_name)
 }
 \arguments{
 \item{data}{A data frame containing the unnormalized training features and target variable.}
 
 \item{target_name}{A character string naming the target variable.
-The target column should be binary (0 = non-potable, 1 = potable).}
+The target column should be binary (e.g., 0/1, "Yes"/"No").}
 }
 \value{
 A list containing the following Exploratory Data Analysis components:
@@ -30,7 +30,7 @@ distribution of the target variable, computes group means, and identifies outlie
 \examples{
 \dontrun{
 # Assuming 'result' is the list returned by preprocess_data()
-eda_results <- exploratory_data_analysis(data = result$train_data)
+eda_results <- exploratory_data_analysis(data = result$train_data, target_name = "Class")
 
 # View the descriptive statistics
 print(eda_results$Descriptive_Statistics)

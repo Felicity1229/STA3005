@@ -27,7 +27,9 @@ Our package is designed for binary classification problems. To demonstrate the c
 3.  Model Evaluation and Result Analysis
 
 ## Data Preprocessing
+
 Here we load our prepared data sets and load them like this.
+
 ```{r}
 data("breast_cancer_dataset")
 data("diabetes_dataset")
@@ -38,7 +40,9 @@ head(diabetes_dataset)
 head(heart_dataset)
 head(mushroom_dataset)
 ```
-Then we use the function in preprocess.R to handle missing value, do correlation analysis, split train-test sets, do Min-Max normalization. 
+
+Then we use the function in preprocess.R to handle missing value, do correlation analysis, split train-test sets, do Min-Max normalization.
+
 ```{r}
 heart_data_res = pre_process_data(heart_dataset, 14)
 diabetes_data_res = pre_process_data(diabetes_dataset,8)
@@ -47,3 +51,143 @@ mushroom_data_res = pre_process_data(mushroom_dataset,1)
 breast_cancer_data_res = preprocessBreastCancerData(breast_cancer_dataset)
 ```
 
+```{r}
+mushroom_data_exploratory_res = exploratory_data_analysis(mushroom_data_res$train_data, target_name ="class")
+
+diabetes_data_exploratory_res = exploratory_data_analysis(diabetes_data_res$train_data,target_name = "Outcome")
+
+heart_data_exploratory_res = exploratory_data_analysis(heart_data_res$train_data,target_name = "target")
+
+breast_data_exploratory_res = exploratory_data_analysis(breast_cancer_data_res$train_data,target_name = "Status")
+```
+
+We can further use visualization helper function to better understand our data
+
+```{r}
+processed_data_visual(breast_cancer_data_res$train_data,target_col = "Status")
+```
+
+Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. Here we make a table to guide you to choose the proper model that suits your valuable data set\~
+
+## Model Suitability for Different Training Sets
+
+The following table provides a brief guideline on the characteristics of training sets that are generally well-suited for each of the five machine learning models implemented in the `ClassifyR` package.
+
+| Model (Algorithm) | Ideal Training Set Characteristics | Considerations & Cautions |
+|-----------------|--------------------------|-----------------------------|
+| **SVM** (Support Vector Machine) | \- **Small to medium** number of samples (e.g., \< 10,000). <br> - **High-dimensional** data (many features, e.g., \> number of samples). <br> - Clear **margin of separation** between classes. <br> - Data with complex boundaries (using kernel trick). | \- Not ideal for very large datasets (slow training). <br> - Requires feature scaling/normalization. <br> - Sensitive to noisy data and outliers. <br> - Kernel selection (e.g., linear, RBF) is important. |
+| **Decision Tree** | \- **Small to medium** datasets. <br> - Data with **mixed data types** (numeric, categorical). <br> - When **interpretability** (simple rules) is a priority. <br> - Features have non-linear and interactive effects. | \- Prone to **overfitting** on training data. <br> - **Unstable**; small changes in data can lead to a completely different tree. <br> - May not perform as well as ensemble methods on complex tasks. |
+| **Random Forest** | \- **Medium to large** datasets. <br> - Data with **high dimensionality** (many features). <br> - Complex relationships between features. <br> - Datasets with **mixed data types**. <br> - Tolerant to outliers and noisy data. | \- Less **interpretable** than a single decision tree. <br> - Slower to train and predict than a single tree, but efficient for its accuracy. <br> - Memory-intensive for very large or high-dimensional data. |
+| **XGBoost** | \- **Medium to very large** structured/tabular datasets. <br> - Data with complex, non-linear patterns. <br> - When **state-of-the-art predictive performance** is the goal. <br> - Datasets where feature interactions matter. | \- Requires careful **hyperparameter tuning** (learning rate, tree depth, subsample). <br> - Can **overfit** if not tuned properly. <br> - More sensitive to outliers than Random Forest. <br> - Slower to train than Random Forest for some datasets. |
+| **Neural Network** | \- **Large datasets** (e.g., \> 10,000 samples). <br> - **High-dimensional** data (e.g., images, text, genomics). <br> - Extremely complex, non-linear underlying patterns. <br> - **Unstructured data** (e.g., images) when combined with specialized architectures (e.g., CNNs), but for tabular data, other models are often faster. | \- Requires **significant computational resources** (CPU/GPU). <br> - **Black-box** model; very hard to interpret. <br> - Requires careful architecture design and hyperparameter tuning. <br> - Often requires **feature scaling** and may benefit from dimensionality reduction. |
+
+
+For the 4 data sets we prepared in this package, we use Neural Network for breast cancer data set. The parameters in this trainModel function should adjust your data set, you need to choose appropriate hidden neuron numbers and lr.
+## Model Training
+
+```{r}
+bc_model = trainModel(X=breast_cancer_data_res$X_train,y=breast_cancer_data_res$y_train,num_iteration = 5000,hidden_neurons = 15,lr=0.01,verbose = TRUE) # using verbose for training detail, you can turn it off by setting it to FALSE
+
+plot(bc_model$cost_hist, type = "l", 
+     xlab = "Iteration", ylab = "Cost",
+     main = "Training Loss",
+     col="red")
+```
+
+
+For Mushroom data set, we use 
+```{r}
+mushroom_rf_model <- train_rf(
+  X = mushroom_data_res$X_train_norm,
+  y = mushroom_data_res$y_train,
+  n_trees = 20,
+  max_depth = 5
+)
+
+mushroom_dt_model = decision_tree(mushroom_data_res$X_train, mushroom_data_res$y_train, mushroom_data_res$X_test, mushroom_data_res$y_test, cp = 0.01)# 这里是用X_train_norm吗？
+```
+
+For Heart disease data set, we use
+```{r}
+heart_xgb_result <- train_xgb(
+  X_train = heart_data_res$X_train_norm,
+  y_train = heart_data_res$y_train,
+  X_test  = heart_data_res$X_test_norm,
+  y_test  = heart_data_res$y_test
+)
+
+```
+
+For Diabetes data set, we use 
+
+```{r}
+diabetes_xgb_model <- train_xgb(
+  X_train = diabetes_data_res$X_train_norm,
+  y_train = diabetes_data_res$y_train,
+  X_test  = diabetes_data_res$X_test_norm,
+  y_test  = diabetes_data_res$y_test
+)
+
+diabetes_svm_model <- train_svm(
+  X_train = diabetes_data_res$X_train,
+  y_train = diabetes_data_res$y_train,
+  X_test  = diabetes_data_res$X_test,
+  y_test  = diabetes_data_res$y_test,
+  tune = TRUE
+)
+```
+
+
+## Model Evaluation and Result Analysis
+For the breast cancer data set
+```{r}
+# 可以调用NN_performance
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## The advantage of our package: 
+1. It demonstrates the complete pipeline for binary classification, including data preparation, data cleaning, exploratory data analysis, model training, prediction making, model comparison, and data/model visualization.
+
+2. It includes five commonly used machine learning classification methods that are suitable for a wide range of datasets.
+
+3. Well-organized helper functions provide a clear and accessible guide for machine learning and R language learners on how to use our package effectively.
+
+## The points learnt in this course:
+1. R Function Development: How to design, implement, and structure R functions with proper parameters, error handling, and return values.
+
+2. R Package Ecosystem: How to leverage powerful packages including ggplot2 (visualization), caret (machine learning workflows), and GGally (exploratory analysis).
+
+3. Function Coordination: How to coordinate multiple functions and design clean internal interfaces to build a cohesive and maintainable R package.
+
+4. Package Structure & Development: How to structure an R package (DESCRIPTION, NAMESPACE, R/ folder, data/ folder) and use devtools for efficient development.
+
+5. Documentation & Vignettes: How to document functions properly using roxygen2 and build complete package vignettes to help users understand and adopt the package.
+
+6. Data Processing & Exploration: How to preprocess real-world datasets (handling missing values, scaling, data splitting) and conduct exploratory data analysis.
+
+7. Model Evaluation & Comparison: How to evaluate classification models using standardized metrics (accuracy, precision, recall, F1, AUC-ROC) and compare multiple models.
+
+8. Data & Model Visualization: How to create publication-quality visualizations for exploratory analysis, model comparison, and performance reporting.
+
+9. Version Control & Collaboration: How to use Git and GitHub for version control and collaborative package development.
+
+10. Testing & Quality Assurance: How to write unit tests using testthat and perform package checks to ensure code reliability and robustness.
