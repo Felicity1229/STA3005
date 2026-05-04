@@ -40,7 +40,7 @@
 #'                       feature_cols = c("pH", "Hardness", "Solids"))
 #' }
 #'
-#' @seealso \code{\link{Exploratory_Data_analysis}} for the EDA function
+#' @seealso \code{\link{exploratory_data_analysis}} for the EDA function
 processed_data_visual <- function(df,
                                   target_col = "Potability",
                                   class_labels = NULL,
