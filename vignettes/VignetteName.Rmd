@@ -103,6 +103,9 @@ mushroom_rf_model <- train_rf(
   n_trees = 20,
   max_depth = 5
 )
+mushroom_rf_result <- predict_rf_model(mushroom_rf_model, mushroom_data_res$X_test_norm)
+mushroom_rf_predictions <- mushroom_rf_result$predictions
+mushroom_rf_pred_prob   <- mushroom_rf_result$pred_prob
 
 mushroom_dt_model = decision_tree(mushroom_data_res$X_train, mushroom_data_res$y_train, mushroom_data_res$X_test, mushroom_data_res$y_test, cp = 0.01)# 这里是用X_train_norm吗？
 ```
@@ -135,6 +138,18 @@ diabetes_svm_result <- train_svm(
   y_test  = diabetes_data_res$y_test,
   tune = TRUE
 )
+
+diabetes_rf_model <- train_rf(
+  X = diabetes_data_res$X_train_norm,
+  y = diabetes_data_res$y_train,
+  n_trees = 20,
+  max_depth = 5
+)
+diabetes_rf_result <- predict_rf_model(diabetes_rf_model, diabetes_data_res$X_test_norm)
+diabetes_rf_predictions <- diabetes_rf_result$predictions
+diabetes_rf_pred_prob <- diabetes_rf_result$pred_prob
+
+
 ```
 
 
