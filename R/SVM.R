@@ -70,19 +70,26 @@ train_svm <- function(X_train, y_train,
     X_test <- X_test[, valid_cols, drop = FALSE]
   }
 
-  full_data <- rbind(X_train, X_test)
-
-  # Convert categorical variables to dummy variables (remove intercept)
-  X_all <- model.matrix(~ . -1, data = full_data)
-
-  # Split back into training and test sets
-  X_train <- X_all[1:nrow(X_train), ]
-  X_test  <- X_all[(nrow(X_train)+1):nrow(X_all), ]
+  # Handle test data when NULL
+  if (is.null(X_test)) {
+    # If no test data, create empty matrix for dummy variable encoding
+    full_data <- X_train
+    X_all <- model.matrix(~ . -1, data = full_data)
+    X_train <- X_all[1:nrow(X_train), ]
+    X_test <- NULL
+  } else {
+    # Combine training and test data for consistent dummy variable encoding
+    full_data <- rbind(X_train, X_test)
+    X_all <- model.matrix(~ . -1, data = full_data)
+    X_train <- X_all[1:nrow(X_train), ]
+    X_test <- X_all[(nrow(X_train) + 1):nrow(X_all), ]
+  }
 
   # Convert labels to factors (required by e1071::svm)
   y_train <- as.factor(y_train)
-  y_test  <- as.factor(y_test)
-
+  if (!is.null(y_test)) {
+    y_test <- as.factor(y_test)
+  }
 
   # Calculate inverse frequency class weights for imbalanced data
   # Formula: weight = total_samples / (n_classes * class_count)
@@ -120,14 +127,15 @@ train_svm <- function(X_train, y_train,
     )
   }
 
-  # Generate predictions for test set
-  test_pred <- predict(best_model, X_test, probability = TRUE)
-
-  # Extract probability attribute
-  prob_attr <- attr(test_pred, "probabilities")
-
-  # Get probability for the positive class (class "1")
-  pred_prob <- prob_attr[, "1"]
+  # Generate predictions for test set (if provided)
+  if (!is.null(X_test) && !is.null(y_test)) {
+    test_pred <- predict(best_model, X_test, probability = TRUE)
+    prob_attr <- attr(test_pred, "probabilities")
+    pred_prob <- prob_attr[, "1"]
+  } else {
+    test_pred <- NULL
+    pred_prob <- NULL
+  }
 
   # Return results in same format as NN_performance()
   return(list(
