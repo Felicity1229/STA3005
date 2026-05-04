@@ -45,8 +45,8 @@ Then we use the function in preprocess.R to handle missing value, do correlation
 
 ```{r}
 heart_data_res = pre_process_data(heart_dataset, 14)
-diabetes_data_res = pre_process_data(diabetes_dataset,8)
-mushroom_data_res = pre_process_data(mushroom_dataset,1)
+diabetes_data_res = pre_process_data(diabetes_dataset, 9)
+mushroom_data_res = pre_process_data(mushroom_dataset, 1)
 
 breast_cancer_data_res = preprocessBreastCancerData(breast_cancer_dataset)
 ```
