@@ -18,8 +18,10 @@
 #' @importFrom dplyr %>%
 #' @importFrom ggplot2 ggplot aes geom_col geom_label coord_polar scale_fill_discrete
 #' @importFrom ggplot2 theme_void ggtitle geom_boxplot labs theme_minimal
-#' @importFrom ggplot2 geom_histogram theme_bw element_text
+#' @importFrom ggplot2 geom_histogram theme_bw element_text position_stack
 #' @importFrom GGally ggpairs wrap
+#' @importFrom rlang .data
+#' @importFrom stats na.omit
 #'
 #' @export
 #'
@@ -107,9 +109,9 @@ processed_data_visual <- function(df,
   dist_df <- get_target_distribution()
 
   if (nrow(dist_df) > 0) {
-    pie_chart <- ggplot(dist_df, aes(x = "", y = Count, fill = Class)) +
+    pie_chart <- ggplot(dist_df, aes(x = "", y = .data$Count, fill = .data$Class)) +
       geom_col() +
-      geom_label(aes(label = Count),
+      geom_label(aes(label = .data$Count),
                  position = position_stack(vjust = 0.5),
                  show.legend = FALSE) +
       coord_polar(theta = "y") +
