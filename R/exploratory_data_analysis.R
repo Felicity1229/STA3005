@@ -114,7 +114,8 @@ exploratory_data_analysis <- function(data, target_name) {
   cat("\n[3] Descriptive Statistics & Outliers\n")
   stats_with_outliers <- cbind(eda_results$Descriptive_Statistics,
                                Outliers = eda_results$Outlier_Counts)
-  print(round(stats_with_outliers, 3))
+  num_cols <- sapply(stats_with_outliers, is.numeric)
+  print(round(stats_with_outliers[num_cols], 3))
 
   # 7.4 Group Means Analysis
   cat("\n[4] Feature Means Grouped By Target (", target_name, ")\n", sep = "")
