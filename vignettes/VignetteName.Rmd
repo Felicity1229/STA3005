@@ -45,8 +45,8 @@ Then we use the function in preprocess.R to handle missing value, do correlation
 
 ```{r}
 heart_data_res = pre_process_data(heart_dataset, 14)
-diabetes_data_res = pre_process_data(diabetes_dataset,8)
-mushroom_data_res = pre_process_data(mushroom_dataset,1)
+diabetes_data_res = pre_process_data(diabetes_dataset, 9)
+mushroom_data_res = pre_process_data(mushroom_dataset, 1)
 
 breast_cancer_data_res = preprocessBreastCancerData(breast_cancer_dataset)
 ```
@@ -121,14 +121,14 @@ heart_xgb_result <- train_xgb(
 For Diabetes data set, we use
 
 ```{r}
-diabetes_xgb_model <- train_xgb(
+diabetes_xgb_result <- train_xgb(
   X_train = diabetes_data_res$X_train_norm,
   y_train = diabetes_data_res$y_train,
   X_test  = diabetes_data_res$X_test_norm,
   y_test  = diabetes_data_res$y_test
 )
 
-diabetes_svm_model <- train_svm(
+diabetes_svm_result <- train_svm(
   X_train = diabetes_data_res$X_train,
   y_train = diabetes_data_res$y_train,
   X_test  = diabetes_data_res$X_test,
