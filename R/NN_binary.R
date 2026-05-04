@@ -53,6 +53,7 @@ getLayerSize <- function(X, y, hidden_neurons) {
 #'   \item{W2}{Output layer weight matrix, dimension (n_y, n_h)}
 #'   \item{b2}{Output layer bias vector, dimension (n_y, 1)}
 #'
+#' @importFrom stats rnorm
 #' @examples
 #' X <- matrix(rnorm(100), nrow = 5)
 #' layer_info <- list(n_x = 5, n_h = 4, n_y = 1)
