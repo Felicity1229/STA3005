@@ -60,17 +60,49 @@ NULL
 #' }
 #' @export
 train_xgb <- function(X_train, y_train, X_test, y_test) {
+  convert_to_numeric <- function(y) {
+    if (is.factor(y)) {
+      # Check if there are 2 levels
+      if (length(levels(y)) != 2) {
+        stop("y must be binary (2 levels). Found: ", paste(levels(y), collapse = ", "))
+      }
+      return(as.numeric(y) - 1)
+    } else if (is.character(y)) {
+      unique_vals <- unique(y)
+      if (length(unique_vals) != 2) {
+        stop("y must be binary. Found: ", paste(unique_vals, collapse = ", "))
+      }
+      # map to 0/1
+      sorted <- sort(unique_vals)
+      return(as.numeric(factor(y, levels = sorted)) - 1)
+    } else if (is.logical(y)) {
+      return(as.numeric(y))
+    } else if (is.numeric(y)) {
+      # check if there is only 0/1
+      if (!all(y %in% c(0, 1))) {
+        warning("Numeric y contains values other than 0/1. Converting to binary.")
+        y <- as.numeric(y > median(y))
+      }
+      return(y)
+    } else {
+      stop("y must be factor, character, logical, or numeric. Found: ", class(y))
+    }
+  }
+
+  y_train_num <- convert_to_numeric(y_train)
+  y_test_num <- convert_to_numeric(y_test)
+
 
   # Convert input data to matrix format
   X_train <- as.matrix(X_train)
   X_test  <- as.matrix(X_test)
 
   # Create xgb.DMatrix objects for efficient training and evaluation
-  dtrain <- xgb.DMatrix(X_train, label = y_train)
-  dtest  <- xgb.DMatrix(X_test, label = y_test)
+  dtrain <- xgb.DMatrix(X_train, label = y_train_num)
+  dtest  <- xgb.DMatrix(X_test, label = y_test_num)
 
   # Set up watchlist to monitor training and test metrics
-  watchlist <- list(
+  evals <- list(
     train = dtrain,
     test = dtest
   )
@@ -91,7 +123,7 @@ train_xgb <- function(X_train, y_train, X_test, y_test) {
     params = params,
     data = dtrain,
     nrounds = 300,          # Number of boosting rounds
-    watchlist = watchlist,  # Monitor both train and test metrics
+    evals = evals,          # Monitor both train and test metrics
     print_every_n = 10,     # Print progress every 10 rounds
     verbose = 1
   )
