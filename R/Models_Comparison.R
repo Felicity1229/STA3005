@@ -80,9 +80,17 @@ models_comparison <- function(true_labels, models_list, positive_class = "1") {
     cm_data_all <- rbind(cm_data_all, cm_table)
 
     # Calculate ROC and AUC
-    roc_obj <- roc(labels_factor, pred_p, quiet = TRUE)
-    auc_val <- as.numeric(auc(roc_obj))
-    roc_list[[model_name]] <- roc_obj
+    # Check if both levels are present in labels_factor for the current comparison
+    if (length(unique(na.omit(labels_factor))) < 2) {
+      message(paste("Note: Only one class present for model", model_name, ". AUC set to NA."))
+      auc_val <- NA
+      # Create a dummy ROC object or skip adding to roc_list
+      roc_list[[model_name]] <- NULL
+    } else {
+      roc_obj <- roc(labels_factor, pred_p, quiet = TRUE)
+      auc_val <- as.numeric(auc(roc_obj))
+      roc_list[[model_name]] <- roc_obj
+    }
 
     # Append to metrics dataframe
     metrics_df <- rbind(metrics_df, data.frame(
@@ -101,19 +109,23 @@ models_comparison <- function(true_labels, models_list, positive_class = "1") {
   print(metrics_df)
 
   # Visualization
-  # Plot 1: Overlay ROC Curves for all models
-  print("Generating combined ROC Curve...")
-  roc_plot <- ggroc(roc_list, linewidth = 1) +
-    theme_minimal() +
-    ggtitle("ROC Curve Comparison") +
-    geom_abline(intercept = 1, slope = 1, linetype = "dashed", color = "darkgrey") +
-    labs(color = "Models", x = "Specificity", y = "Sensitivity") +
-    theme(
-      plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-      legend.position = "bottom",
-      legend.title = element_text(face = "bold")
-    )
-  print(roc_plot)
+  # Plot 1: Overlay ROC Curves (Only if we have valid ROC objects)
+  if (length(roc_list) > 0 && !all(sapply(roc_list, is.null))) {
+    print("Generating combined ROC Curve...")
+    roc_plot <- ggroc(roc_list, linewidth = 1) +
+      theme_minimal() +
+      ggtitle("ROC Curve Comparison") +
+      geom_abline(intercept = 1, slope = 1, linetype = "dashed", color = "darkgrey") +
+      labs(color = "Models", x = "Specificity", y = "Sensitivity") +
+      theme(
+        plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+        legend.position = "bottom",
+        legend.title = element_text(face = "bold")
+      )
+    print(roc_plot)
+  } else {
+    message("Skipping ROC plot: No valid ROC objects calculated.")
+  }
 
   # Plot 2: Bar Chart for Metrics Comparison
   print("Generating Metrics Bar Chart...")

@@ -54,7 +54,7 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
   y_test <- as.factor(y_test)
 
   # 2. Model training
-  message("Training Decision Tree Model...")
+  # message("Training Decision Tree Model...")
 
   # Set up 10-fold cross-validation
   train_control <- trainControl(method = "cv", number = 10)
@@ -72,7 +72,7 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
 
   # Extract the best decision tree
   dt_model <- cv_model$finalModel
-  message(paste("Best tuned cp selected by model:", cv_model$bestTune$cp))
+  # message(paste("Best tuned cp selected by model:", cv_model$bestTune$cp))
 
   # 3. Model Prediction
   predictions <- predict(cv_model, newdata = X_test)
@@ -83,7 +83,17 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
   levels_pred <- levels(predictions)
   test_target <- factor(y_test, levels = levels_pred)
 
-  conf_matrix <- confusionMatrix(predictions, test_target)
+  valid_idx <- !is.na(test_target)
+
+  if (sum(valid_idx) == 0) {
+    stop("Error: No valid labels in y_test matching the training classes. Cannot evaluate model.")
+  }
+
+  if (!all(valid_idx)) {
+    warning("Warning: Unseen factor levels detected in y_test. They have been ignored during performance evaluation.")
+  }
+
+  conf_matrix <- confusionMatrix(predictions[valid_idx], test_target[valid_idx])
 
   # Print core evaluation results
   # message("===== Decision Tree Evaluation =====")

@@ -41,8 +41,14 @@ evaluate_models <- function(true_labels, model_result, positive_class) {
   cm <- confusionMatrix(pred_c, labels_factor, positive = positive_class, mode = "everything")
 
   # 3. Calculate ROC and AUC
-  roc_obj <- roc(labels_factor, pred_p, quiet = TRUE)
-  auc_val <- as.numeric(auc(roc_obj))
+  if (length(unique(na.omit(labels_factor))) < 2) {
+    message(paste("Note: Only one class present. AUC set to NA."))
+    auc_val <- NA
+    roc_obj <- NULL # You might need to handle the plot(roc_obj) call too
+  } else {
+    roc_obj <- roc(labels_factor, pred_p, quiet = TRUE)
+    auc_val <- as.numeric(auc(roc_obj))
+  }
 
   # 4. Store Metrics
   metrics_df <- data.frame(
@@ -59,9 +65,13 @@ evaluate_models <- function(true_labels, model_result, positive_class) {
   print(metrics_df)
 
   # 5. Plot 1: ROC Curve (Using standard graphics via pROC)
-  message("Generating ROC Curve...")
-  plot(roc_obj, col = "darkblue", main = paste("ROC Curve -", name), lwd = 2)
-  text(x = 0.2, y = 0.2, labels = paste("AUC =", round(auc_val, 4)), col = "darkblue", cex = 1.2, font = 2)
+  if (!is.null(roc_obj)) {
+    message("Generating ROC Curve...")
+    plot(roc_obj, col = "darkblue", main = paste("ROC Curve -", name), lwd = 2)
+    text(x = 0.2, y = 0.2, labels = paste("AUC =", round(auc_val, 4)), col = "darkblue", cex = 1.2, font = 2)
+  } else {
+    message("Skipping ROC plot: No control/case observations.")
+  }
 
   # 6. Plot 2: Confusion Matrix Heatmap
   message("Generating Confusion Matrix Heatmap...")
