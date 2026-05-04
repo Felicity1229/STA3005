@@ -143,7 +143,22 @@ rf_predict_tree <- function(tree, x) {
     return(tree$label)
   }
 
-  if (x[[tree$feature]] <= tree$value) {
+  feature_value <- tryCatch({
+    val <- x[[tree$feature]]
+    if (is.null(val) || length(val) == 0) NA else val
+  }, error = function(e) NA)
+
+  if (is.na(feature_value)) {
+    if (!is.null(tree$left)) {
+      return(rf_predict_tree(tree$left, x))
+    } else if (!is.null(tree$right)) {
+      return(rf_predict_tree(tree$right, x))
+    } else {
+      return("0")
+    }
+  }
+
+  if (feature_value <= tree$value) {
     return(rf_predict_tree(tree$left, x))
   } else {
     return(rf_predict_tree(tree$right, x))
@@ -196,11 +211,21 @@ train_rf <- function(X, y, n_trees = 20, max_depth = 5) {
 #'
 #' @export
 predict_rf_model <- function(trees, X) {
-  results <- lapply(1:nrow(X), function(i){
 
-    votes <- sapply(trees, function(tree) {
-      rf_predict_tree(tree, X[i, ])
-    })
+  if (is.vector(X) && !is.data.frame(X)) {
+    X <- as.data.frame(t(X))
+  }
+
+  results <- list()
+
+  for (i in 1:nrow(X)) {
+    x_row <- X[i, , drop = FALSE]
+    votes <- character(length(trees))
+
+    for (j in seq_along(trees)) {
+      tree <- trees[[j]]
+      votes[j] <- rf_predict_tree(tree, x_row)
+    }
 
     vote_table <- table(votes)
 
@@ -212,8 +237,9 @@ predict_rf_model <- function(trees, X) {
                      vote_table["1"] / length(trees),
                      0)
 
-    return(list(class = pred_class, prob = prob_1))
-  })
+    results[[i]] <- list(class = pred_class, prob = prob_1)
+  }
+
   # Extract results
   predictions <- as.factor(sapply(results, function(x) x$class))
   pred_prob   <- as.numeric(sapply(results, function(x) x$prob))
