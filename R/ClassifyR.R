@@ -14,8 +14,8 @@
 #'
 #' @section Data Preprocessing and Exploratory Data Analysis (EDA):
 #' \itemize{
-#'   \item \code{preprocess_data()}: Comprehensive data preprocessing pipeline including missing value imputation, normalization, and train-test splitting.
-#'   \item \code{Exploratory_Data_analysis()}: Calculates descriptive statistics, target distribution, and identifies outliers using the IQR method.
+#'   \item \code{pre_process_data()}: Comprehensive data preprocessing pipeline including missing value imputation, normalization, and train-test splitting.
+#'   \item \code{exploratory_data_analysis()}: Calculates descriptive statistics, target distribution, and identifies outliers using the IQR method.
 #'   \item \code{processed_data_visual()}: Generates visual summaries including pie charts, boxplots, histograms, and correlation matrices.
 #'   \item \code{preprocessBreastCancerData()}: Dedicated data preprocessing pipeline specifically for the breast cancer dataset.
 #' }
@@ -23,9 +23,9 @@
 #' @section Machine Learning Modeling:
 #' \itemize{
 #'   \item \code{decision_tree()}: Trains a decision tree classifier with 10-fold cross-validation and hyperparameter tuning.
-#'   \item \code{train_random_forest()}: Trains a Random Forest model with automatic \code{mtry} tuning and threshold optimization.
-#'   \item \code{train_svm_model()}: Trains a Support Vector Machine (SVM) model for binary classification with hyperparameter tuning.
-#'   \item \code{train_xgb_full()}: Trains an XGBoost model with automatic threshold optimization via F1 score maximization.
+#'   \item \code{train_rf()}: Trains a Random Forest model with automatic \code{mtry} tuning and threshold optimization.
+#'   \item \code{train_svm()}: Trains a Support Vector Machine (SVM) model for binary classification with hyperparameter tuning.
+#'   \item \code{train_xgb()}: Trains an XGBoost model with automatic threshold optimization via F1 score maximization.
 #'   \item \code{NN_performance()}: Wrapper function to generate predictions and evaluate performance for a single-hidden-layer neural network.
 #' }
 #'
@@ -38,7 +38,7 @@
 #' @section Model Evaluation and Comparison:
 #' \itemize{
 #'   \item \code{evaluate_models()}: Computes core metrics (Accuracy, F1-Score, AUC) and generates ROC & heatmap visualizations for a single model.
-#'   \item \code{compare_models()}: Evaluates and visually compares multiple trained models simultaneously, generating overlaid ROC curves, bar charts of metrics, and faceted confusion matrix heatmaps.
+#'   \item \code{models_comparison()}: Evaluates and visually compares multiple trained models simultaneously, generating overlaid ROC curves, bar charts of metrics, and faceted confusion matrix heatmaps.
 #' }
 #'
 #' @name ClassifyR

@@ -1,12 +1,12 @@
-#' Exploratory Analysis for Water Quality Data
+#' Exploratory Analysis for Datasets
 #'
 #' This function performs a comprehensive exploratory data analysis on the
 #' unnormalized training dataset. It calculates descriptive statistics, evaluates the
 #' distribution of the target variable, computes group means, and identifies outliers.
 #'
 #' @param data A data frame containing the unnormalized training features and target variable.
-#' @param target_name A character string naming the target variable. Default is "Potability".
-#'   The Potability column should be binary (0 = non-potable, 1 = potable).
+#' @param target_name A character string naming the target variable.
+#'   The target column should be binary (0 = non-potable, 1 = potable).
 #'
 #' @return A list containing the following Exploratory Data Analysis components:
 #' \itemize{
@@ -26,12 +26,12 @@
 #' @examples
 #' \dontrun{
 #' # Assuming 'result' is the list returned by preprocess_data()
-#' eda_results <- Exploratory_Data_analysis(data = result$train_data)
+#' eda_results <- exploratory_data_analysis(data = result$train_data)
 #'
 #' # View the descriptive statistics
 #' print(eda_results$Descriptive_Statistics)
 #' }
-Exploratory_Data_analysis <- function(data, target_name = "Potability") {
+exploratory_data_analysis <- function(data, target_name = "Potability") {
 
   # 1. Parameter Validation
   if (!(target_name %in% colnames(data))) {
@@ -44,18 +44,18 @@ Exploratory_Data_analysis <- function(data, target_name = "Potability") {
   # 2. Extract Basic Information
   eda_results$Dimensions <- dim(data)
 
-  numeric_data <- dplyr::select(data, dplyr::where(is.numeric))
+  numeric_data <- select(data, where(is.numeric))
 
   # 3. Detailed Descriptive Statistics
   calc_stats <- function(x) {
     c(
       Min = min(x, na.rm = TRUE),
-      Q1 = unname(stats::quantile(x, 0.25, na.rm = TRUE)),
-      Median = stats::median(x, na.rm = TRUE),
+      Q1 = unname(quantile(x, 0.25, na.rm = TRUE)),
+      Median = median(x, na.rm = TRUE),
       Mean = mean(x, na.rm = TRUE),
-      Q3 = unname(stats::quantile(x, 0.75, na.rm = TRUE)),
+      Q3 = unname(quantile(x, 0.75, na.rm = TRUE)),
       Max = max(x, na.rm = TRUE),
-      SD = stats::sd(x, na.rm = TRUE)
+      SD = sd(x, na.rm = TRUE)
     )
   }
 
@@ -76,14 +76,14 @@ Exploratory_Data_analysis <- function(data, target_name = "Potability") {
 
   # 5. Group Means by Target
   eda_results$Group_Means <- data %>%
-    dplyr::group_by(.data[[target_name]]) %>%
-    dplyr::summarise(dplyr::across(dplyr::where(is.numeric), ~ mean(.x, na.rm = TRUE)))
+    group_by(.data[[target_name]]) %>%
+    summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)))
 
   colnames(eda_results$Group_Means)[1] <- target_name
 
   # 6. Outlier Detection using IQR method
   detect_outliers_iqr <- function(x) {
-    q_vals <- stats::quantile(x, probs = c(0.25, 0.75), na.rm = TRUE)
+    q_vals <- quantile(x, probs = c(0.25, 0.75), na.rm = TRUE)
     Q1 <- q_vals[1]
     Q3 <- q_vals[2]
     IQR_val <- Q3 - Q1
@@ -120,7 +120,7 @@ Exploratory_Data_analysis <- function(data, target_name = "Potability") {
   cat("\n[4] Feature Means Grouped By Target (", target_name, ")\n", sep = "")
 
   formatted_means <- eda_results$Group_Means %>%
-    dplyr::mutate(dplyr::across(dplyr::where(is.numeric), ~ round(.x, 3)))
+    mutate(across(where(is.numeric), ~ round(.x, 3)))
 
   print(as.data.frame(formatted_means), row.names = FALSE)
 

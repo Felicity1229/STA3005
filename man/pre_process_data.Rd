@@ -4,10 +4,10 @@
 \alias{pre_process_data}
 \title{Data Preprocessing Pipeline for Binary Classification}
 \usage{
-pre_process_data(file_path, tag_column, split_ratio = 0.7, seed = 3)
+pre_process_data(data, tag_column, split_ratio = 0.7, seed = 3)
 }
 \arguments{
-\item{file_path}{Character string specifying the path to the CSV file.}
+\item{data}{A data frame containing the dataset to be processed.}
 
 \item{tag_column}{Integer indicating which column contains the target variable.
 For binary classification, values will be converted to 0/1.}
@@ -48,7 +48,7 @@ Performs end-to-end data preprocessing including:
 \examples{
 \dontrun{
 # Preprocess diabetes dataset
-result <- pre_process_data("diabetes.csv", tag_column = 9, split_ratio = 0.7, seed = 3)
+result <- pre_process_data("diabetes_dataset", tag_column = 9, split_ratio = 0.7, seed = 3)
 
 # Access preprocessed data
 X_train <- result$X_train_norm

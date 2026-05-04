@@ -45,7 +45,7 @@
 #' )
 #'
 #' # 3. Run the comprehensive comparison
-#' final_comparison <- compare_multiple_models(
+#' final_comparison <- models_comparison(
 #'   true_labels = y_test,
 #'   models_list = my_models,
 #'   positive_class = "X1"
@@ -54,7 +54,7 @@
 #' # 4. View the numerical results
 #' print(final_comparison)
 #' }
-compare_models <- function(true_labels, models_list, positive_class = "X1") {
+models_comparison <- function(true_labels, models_list, positive_class = "1") {
 
   # Initialize dataframes to store overall metrics and confusion matrix data
   metrics_df <- data.frame()
@@ -62,7 +62,7 @@ compare_models <- function(true_labels, models_list, positive_class = "X1") {
   roc_list <- list()
 
   # Ensure true labels are properly formatted
-  labels_factor <- factor(true_labels, levels = c("X0", "X1"))
+  labels_factor <- factor(true_labels, levels = c("0", "1"))
 
   # 1. Loop through the named list of models
   for (model_name in names(models_list)) {
@@ -102,7 +102,7 @@ compare_models <- function(true_labels, models_list, positive_class = "X1") {
   # Visualization
   # Plot 1: Overlay ROC Curves for all models
   print("Generating combined ROC Curve...")
-  roc_plot <- ggroc(roc_list, size = 1) +
+  roc_plot <- ggroc(roc_list, linewidth = 1) +
     theme_minimal() +
     ggtitle("ROC Curve Comparison") +
     geom_abline(intercept = 1, slope = 1, linetype = "dashed", color = "darkgrey") +
@@ -160,6 +160,6 @@ compare_models <- function(true_labels, models_list, positive_class = "X1") {
 #   "XGBoost"         = xgb_result
 # )
 #
-# final_comparison <- compare_models(true_labels = y_test,
+# final_comparison <- models_comparison(true_labels = y_test,
 #                                            models_list = my_all_models,
 #                                            positive_class = "X1")

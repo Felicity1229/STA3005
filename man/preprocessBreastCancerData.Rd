@@ -4,10 +4,10 @@
 \alias{preprocessBreastCancerData}
 \title{Preprocess Breast Cancer Dataset}
 \usage{
-preprocessBreastCancerData(file_path, train_ratio = 0.8)
+preprocessBreastCancerData(train_data, train_ratio = 0.8)
 }
 \arguments{
-\item{file_path}{Path to the Breast_Cancer.csv file}
+\item{train_data}{A data frame containing the Breast Cancer dataset.}
 
 \item{train_ratio}{Proportion of data to use for training (default: 0.8)}
 }
@@ -35,7 +35,7 @@ Performs complete data preprocessing for the breast cancer dataset including:
 }
 \examples{
 \dontrun{
-result <- preprocessBreastCancerData("data/Breast_Cancer.csv")
+result <- preprocessBreastCancerData("breast_cancer_dataset")
 X_train <- result$X_train
 y_train <- result$y_train
 }

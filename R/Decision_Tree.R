@@ -41,7 +41,7 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
 
   # 1. Data restructuring
   # Drop columns with only one unique value (zero variance)
-  valid_cols <- sapply(X_train, function(x) length(unique(stats::na.omit(x))) > 1)
+  valid_cols <- sapply(X_train, function(x) length(unique(na.omit(x))) > 1)
   removed_cols <- names(valid_cols)[!valid_cols]
   if (length(removed_cols) > 0) {
     message("Removed columns: ", paste(removed_cols, collapse = ", "))
@@ -57,9 +57,9 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
   message("Training Decision Tree Model...")
 
   # Set up 10-fold cross-validation
-  train_control <- caret::trainControl(method = "cv", number = 10)
+  train_control <- trainControl(method = "cv", number = 10)
 
-  cv_model <- caret::train(
+  cv_model <- train(
     x = X_train,
     y = y_train,
     method = "rpart",
@@ -67,7 +67,7 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
     # Find the best Complexity Parameter `cp` between 0.001 and 0.1
     tuneGrid = expand.grid(cp = seq(0.001, 0.1, by = 0.005)),
     # Prevent the tree growing infinitely
-    control = rpart::rpart.control(minsplit = 20, maxdepth = 15)
+    control = rpart.control(minsplit = 20, maxdepth = 15)
   )
 
   # Extract the best decision tree
@@ -75,24 +75,24 @@ decision_tree <- function(X_train, y_train, X_test, y_test, cp = 0.01) {
   message(paste("Best tuned cp selected by model:", cv_model$bestTune$cp))
 
   # 3. Model Prediction
-  predictions <- stats::predict(cv_model, newdata = X_test)
-  pred_prob <- stats::predict(cv_model, newdata = X_test, type = "prob")
+  predictions <- predict(cv_model, newdata = X_test)
+  pred_prob <- predict(cv_model, newdata = X_test, type = "prob")
 
   # 4. Performance Evaluation
   # Ensure levels are consistent
   levels_pred <- levels(predictions)
   test_target <- factor(y_test, levels = levels_pred)
 
-  conf_matrix <- caret::confusionMatrix(predictions, test_target)
+  conf_matrix <- confusionMatrix(predictions, test_target)
 
   # Print core evaluation results
-  message("===== Decision Tree Evaluation =====")
-  cat("Accuracy :", round(conf_matrix$overall["Accuracy"], 4), "\n")
-  cat("Kappa    :", round(conf_matrix$overall["Kappa"], 4), "\n")
-  print(conf_matrix$table)
+  # message("===== Decision Tree Evaluation =====")
+  # cat("Accuracy :", round(conf_matrix$overall["Accuracy"], 4), "\n")
+  # cat("Kappa    :", round(conf_matrix$overall["Kappa"], 4), "\n")
+  # print(conf_matrix$table)
 
   # 5. Plot the decision tree structure
-  rpart.plot::rpart.plot(dt_model, main = "Decision Tree Structure", type = 4, extra = 104)
+  # rpart.plot(dt_model, main = "Decision Tree Structure", type = 4, extra = 104)
 
   # Return the result
   return(list(

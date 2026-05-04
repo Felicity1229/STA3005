@@ -20,7 +20,7 @@ NULL
 #'   \item Applying Min-Max normalization on numeric features
 #' }
 #'
-#' @param file_path Character string specifying the path to the CSV file.
+#' @param data A data frame containing the dataset to be processed.
 #' @param tag_column Integer indicating which column contains the target variable.
 #'        For binary classification, values will be converted to 0/1.
 #' @param split_ratio Numeric value between 0 and 1 specifying the proportion
@@ -44,7 +44,7 @@ NULL
 #' @examples
 #' \dontrun{
 #' # Preprocess diabetes dataset
-#' result <- pre_process_data("diabetes.csv", tag_column = 9, split_ratio = 0.7, seed = 3)
+#' result <- pre_process_data("diabetes_dataset", tag_column = 9, split_ratio = 0.7, seed = 3)
 #'
 #' # Access preprocessed data
 #' X_train <- result$X_train_norm
@@ -53,19 +53,17 @@ NULL
 #' y_test <- result$y_test
 #' }
 #' @export
-pre_process_data <- function(file_path, tag_column, split_ratio = 0.7, seed = 3) {
+pre_process_data <- function(data, tag_column, split_ratio = 0.7, seed = 3) {
   # 1. Load and explore data
-  # Read CSV file into data frame
-  df <- read.csv(file_path)
-  head(df)      # Display first few rows
-  str(df)       # Check data types of each column
-  summary(df)   # Summary statistics for all variables
+  head(data, 3)      # Display first few rows
+  # str(data)       # Check data types of each column
+  # summary(data)   # Summary statistics for all variables
   # Store target column name for later use
-  tag_col_name <- names(df)[tag_column]
+  tag_col_name <- names(data)[tag_column]
 
   # 2. Check for missing values
   # Calculate number of missing values per column
-  missing_counts <- colSums(is.na(df))
+  missing_counts <- colSums(is.na(data))
   missing_counts
 
   # 3. Impute missing values using mean imputation
@@ -75,22 +73,22 @@ pre_process_data <- function(file_path, tag_column, split_ratio = 0.7, seed = 3)
 
     # Replace NAs with column mean
     for (col in cols_with_na) {
-      df[[col]][is.na(df[[col]])] <- mean(df[[col]], na.rm = TRUE)
+      data[[col]][is.na(data[[col]])] <- mean(data[[col]], na.rm = TRUE)
     }
 
     print("Filled:")
     print(paste(cols_with_na, collapse = ", "))
-    print(colSums(is.na(df)))  # Verify no missing values remain
+    print(colSums(is.na(data)))  # Verify no missing values remain
   }else{
     print("No missing value")
   }
 
   # 4. Correlation analysis
   # Identify numeric columns for correlation calculation
-  numeric_cols <- sapply(df, is.numeric)
+  numeric_cols <- sapply(data, is.numeric)
 
   if (sum(numeric_cols) >= 2) {  # Need at least 2 numeric columns
-    cor_matrix <- cor(df[, numeric_cols])
+    cor_matrix <- cor(data[, numeric_cols])
     print(cor_matrix)
   } else {
     print("The correlation matrix cannot be calculated.")
@@ -98,16 +96,16 @@ pre_process_data <- function(file_path, tag_column, split_ratio = 0.7, seed = 3)
 
   # 5. Check target variable distribution
   # Display frequency table of the target variable
-  print(table(df[[tag_col_name]]))
+  print(table(data[[tag_col_name]]))
 
   # 6. Split data into training and test sets
   set.seed(seed)
 
   # Stratified split based on target variable
-  split <- sample.split(df[[tag_col_name]], SplitRatio = split_ratio)
+  split <- sample.split(data[[tag_col_name]], SplitRatio = split_ratio)
 
-  train_data <- subset(df, split == TRUE)
-  test_data  <- subset(df, split == FALSE)
+  train_data <- subset(data, split == TRUE)
+  test_data  <- subset(data, split == FALSE)
 
   dim(train_data)   # Check training set dimensions
   dim(test_data)    # Check test set dimensions

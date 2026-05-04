@@ -63,6 +63,12 @@ train_svm <- function(X_train, y_train,
                             tune = TRUE) {
 
   # Combine training and test data to ensure consistent dummy variable encoding
+  valid_cols <- sapply(X_train, function(x) length(unique(na.omit(x))) > 1)
+  X_train <- X_train[, valid_cols, drop = FALSE]
+  if (!is.null(X_test)) {
+    X_test <- X_test[, valid_cols, drop = FALSE]
+  }
+
   full_data <- rbind(X_train, X_test)
 
   # Convert categorical variables to dummy variables (remove intercept)

@@ -10,7 +10,7 @@
 #' - Z-score scaling for continuous variables (Age, Tumor.Size, Survival.Months)
 #' - Train/test split with matrix transposition for neural network input
 #'
-#' @param file_path Path to the Breast_Cancer.csv file
+#' @param train_data A data frame containing the Breast Cancer dataset.
 #' @param train_ratio Proportion of data to use for training (default: 0.8)
 #' @return A list containing:
 #'   \item{X_train}{Training feature matrix (features as rows, samples as columns)}
@@ -22,14 +22,12 @@
 #'
 #' @examples
 #' \dontrun{
-#' result <- preprocessBreastCancerData("data/Breast_Cancer.csv")
+#' result <- preprocessBreastCancerData("breast_cancer_dataset")
 #' X_train <- result$X_train
 #' y_train <- result$y_train
 #' }
 #' @export
-preprocessBreastCancerData <- function(file_path, train_ratio = 0.8) {
-  # Read data
-  train_data <- read.csv(file_path)
+preprocessBreastCancerData <- function(train_data, train_ratio = 0.8) {
 
   # 1. Encode target variable Status (Alive -> 1, Dead -> 0)
   train_data$Status <- ifelse(train_data$Status == "Alive", 1, 0)

@@ -38,11 +38,11 @@ evaluate_models <- function(true_labels, model_result, positive_class) {
   pred_p <- model_result$pred_prob
 
   # 2. Calculate Confusion Matrix
-  cm <- caret::confusionMatrix(pred_c, labels_factor, positive = positive_class, mode = "everything")
+  cm <- confusionMatrix(pred_c, labels_factor, positive = positive_class, mode = "everything")
 
   # 3. Calculate ROC and AUC
-  roc_obj <- pROC::roc(labels_factor, pred_p, quiet = TRUE)
-  auc_val <- as.numeric(pROC::auc(roc_obj))
+  roc_obj <- roc(labels_factor, pred_p, quiet = TRUE)
+  auc_val <- as.numeric(auc(roc_obj))
 
   # 4. Store Metrics
   metrics_df <- data.frame(
@@ -60,43 +60,43 @@ evaluate_models <- function(true_labels, model_result, positive_class) {
 
   # 5. Plot 1: ROC Curve (Using standard graphics via pROC)
   message("Generating ROC Curve...")
-  graphics::plot(roc_obj, col = "darkblue", main = paste("ROC Curve -", name), lwd = 2)
-  graphics::text(x = 0.2, y = 0.2, labels = paste("AUC =", round(auc_val, 4)), col = "darkblue", cex = 1.2, font = 2)
+  plot(roc_obj, col = "darkblue", main = paste("ROC Curve -", name), lwd = 2)
+  text(x = 0.2, y = 0.2, labels = paste("AUC =", round(auc_val, 4)), col = "darkblue", cex = 1.2, font = 2)
 
   # 6. Plot 2: Confusion Matrix Heatmap
   message("Generating Confusion Matrix Heatmap...")
   cm_table <- as.data.frame(cm$table)
   colnames(cm_table) <- c("Prediction", "Reference", "Freq")
 
-  heatmap_plot <- ggplot2::ggplot(cm_table, ggplot2::aes(x = .data$Reference, y = .data$Prediction, fill = .data$Freq)) +
-    ggplot2::geom_tile(color = "white") +
-    ggplot2::geom_text(ggplot2::aes(label = .data$Freq), vjust = 0.5, fontface = "bold", size = 6) +
-    ggplot2::scale_fill_gradient(low = "#F0F8FF", high = "#4682B4") +
-    ggplot2::theme_minimal() +
-    ggplot2::labs(
+  heatmap_plot <- ggplot(cm_table, aes(x = .data$Reference, y = .data$Prediction, fill = .data$Freq)) +
+    geom_tile(color = "white") +
+    geom_text(aes(label = .data$Freq), vjust = 0.5, fontface = "bold", size = 6) +
+    scale_fill_gradient(low = "#F0F8FF", high = "#4682B4") +
+    theme_minimal() +
+    labs(
       title = paste("Confusion Matrix Heatmap -", name),
       x = "Actual Class (Reference)",
       y = "Predicted Class"
     ) +
-    ggplot2::theme(
-      plot.title = ggplot2::element_text(face = "bold", size = 14, hjust = 0.5),
-      axis.title = ggplot2::element_text(face = "bold"),
-      axis.text = ggplot2::element_text(size = 12)
+    theme(
+      plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+      axis.title = element_text(face = "bold"),
+      axis.text = element_text(size = 12)
     )
 
   print(heatmap_plot)
 
   # 7. Plot 3: Bar Chart for Metrics (Acc, F1, AUC)
   message("Generating Metrics Bar Chart...")
-  melted_df <- reshape2::melt(metrics_df, id.vars = "Model",
-                              measure.vars = c("Accuracy", "F1_Score", "AUC"))
+  melted_df <- melt(metrics_df, id.vars = "Model",
+                    measure.vars = c("Accuracy", "F1_Score", "AUC"))
 
-  bar_plot <- ggplot2::ggplot(melted_df, ggplot2::aes(x = .data$Model, y = .data$value, fill = .data$variable)) +
-    ggplot2::geom_bar(stat = "identity", position = "dodge", width = 0.7) +
-    ggplot2::theme_minimal() +
-    ggplot2::labs(title = paste("Performance Metrics -", name), y = "Score", x = "Metrics") +
-    ggplot2::scale_fill_brewer(palette = "Set2") +
-    ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank())
+  bar_plot <- ggplot(melted_df, aes(x = .data$Model, y = .data$value, fill = .data$variable)) +
+    geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+    theme_minimal() +
+    labs(title = paste("Performance Metrics -", name), y = "Score", x = "Metrics") +
+    scale_fill_brewer(palette = "Set2") +
+    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 
   print(bar_plot)
 
