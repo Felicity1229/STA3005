@@ -15,7 +15,7 @@ The names of the list elements will be directly used as the model names in the
 output tables and plot legends.}
 
 \item{positive_class}{A character string representing the positive class level.
-Default is \code{"X1"}. This must strictly match one of the levels in \code{true_labels}.}
+Default is \code{"1"}. This must strictly match one of the levels in \code{true_labels}.}
 }
 \value{
 A \code{data.frame} containing the computed evaluation metrics for all models,
@@ -38,7 +38,7 @@ a bar chart of metrics, and faceted confusion matrix heatmaps.
 }
 \examples{
 \dontrun{
-# 1. Assume 'y_test' contains true labels (e.g., "X0", "X1")
+# 1. Assume 'y_test' contains true labels (e.g., "0", "1")
 # 2. Prepare the named list of model results
 my_models <- list(
   "Decision Tree"  = list(predictions = dtr_preds, pred_prob = dtr_probs),
@@ -50,7 +50,7 @@ my_models <- list(
 final_comparison <- models_comparison(
   true_labels = y_test,
   models_list = my_models,
-  positive_class = "X1"
+  positive_class = "1"
 )
 
 # 4. View the numerical results
