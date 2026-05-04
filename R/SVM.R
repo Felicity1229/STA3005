@@ -63,11 +63,39 @@ train_svm <- function(X_train, y_train,
                             kernel_type = "radial",
                             tune = TRUE) {
 
+  # 1. 处理缺失值
+  fill_na <- function(df) {
+    for (i in 1:ncol(df)) {
+      if (any(is.na(df[, i]))) {
+        if (is.numeric(df[, i])) {
+          median_val <- median(df[, i], na.rm = TRUE)
+          df[is.na(df[, i]), i] <- median_val
+        } else {
+          # 对非数值列，用众数填充
+          mode_val <- names(sort(table(df[, i]), decreasing = TRUE))[1]
+          df[is.na(df[, i]), i] <- mode_val
+        }
+      }
+    }
+    return(df)
+  }
+
   # Combine training and test data to ensure consistent dummy variable encoding
   valid_cols <- sapply(X_train, function(x) length(unique(na.omit(x))) > 1)
+
+  # 如果所有列都是零方差，保留至少一列
+  if (sum(valid_cols) == 0) {
+    valid_cols <- rep(TRUE, ncol(X_train))
+  }
+
   X_train <- X_train[, valid_cols, drop = FALSE]
   if (!is.null(X_test)) {
     X_test <- X_test[, valid_cols, drop = FALSE]
+  }
+
+  X_train <- fill_na(X_train)
+  if (!is.null(X_test)) {
+    X_test <- fill_na(X_test)
   }
 
   # Handle test data when NULL
@@ -89,6 +117,14 @@ train_svm <- function(X_train, y_train,
   y_train <- as.factor(y_train)
   if (!is.null(y_test)) {
     y_test <- as.factor(y_test)
+    # 检查测试集是否有训练集中未出现的水平
+    train_levels <- levels(y_train)
+    test_levels <- levels(y_test)
+
+    if (!all(test_levels %in% train_levels)) {
+      stop("Test set contains factor levels not seen in training set: ",
+           paste(setdiff(test_levels, train_levels), collapse = ", "))
+    }
   }
 
   # Calculate inverse frequency class weights for imbalanced data
@@ -99,25 +135,38 @@ train_svm <- function(X_train, y_train,
 
   # Hyperparameter tuning using 5-fold cross-validation
   if (tune) {
+    tune_result <- tryCatch({
+      tune(
+        svm,
+        train.x = X_train,
+        train.y = y_train,
+        kernel = kernel_type,
+        ranges = list(
+          cost = c(0.1, 1, 10),
+          gamma = c(0.01, 0.1, 1)
+        ),
+        class.weights = class_weights,
+        probability = TRUE,
+        tunecontrol = tune.control(cross = 5)
+      )
+    }, error = function(e) {
+      # 如果调参失败，使用默认参数
+      warning("Tuning failed, using default parameters: ", e$message)
+      return(NULL)
+    })
 
-    tune_result <- tune(
-      svm,
-      train.x = X_train,
-      train.y = y_train,
-      kernel = kernel_type,
-      ranges = list(
-        cost = c(0.1, 1, 10),     # Regularization parameter
-        gamma = c(0.01, 0.1, 1)   # Kernel width parameter (for radial kernel)
-      ),
-      class.weights = class_weights,
-      probability = TRUE,         # Enable probability predictions
-      tunecontrol = tune.control(cross = 5)  # 5-fold cross-validation
-    )
-
-    best_model <- tune_result$best.model
-
+    if (!is.null(tune_result)) {
+      best_model <- tune_result$best.model
+    } else {
+      best_model <- svm(
+        x = X_train,
+        y = y_train,
+        kernel = kernel_type,
+        probability = TRUE,
+        class.weights = class_weights
+      )
+    }
   } else {
-    # Train without tuning, using default parameters
     best_model <- svm(
       x = X_train,
       y = y_train,
@@ -127,11 +176,26 @@ train_svm <- function(X_train, y_train,
     )
   }
 
+  # Check if nSV is 0
+  if (is.null(best_model$nSV) || all(best_model$nSV == 0)) {
+    message("No support vectors found. Model may not have converged properly.")
+  }
+
   # Generate predictions for test set (if provided)
   if (!is.null(X_test) && !is.null(y_test)) {
+    if (is.null(dim(X_test))) {
+      X_test <- as.data.frame(t(X_test))
+    }
+    X_test <- as.data.frame(X_test)
+    colnames(X_test) <- colnames(X_train)
     test_pred <- predict(best_model, X_test, probability = TRUE)
     prob_attr <- attr(test_pred, "probabilities")
-    pred_prob <- prob_attr[, "1"]
+    # Ensure that probability exists
+    if (!is.null(prob_attr) && "1" %in% colnames(prob_attr)) {
+      pred_prob <- prob_attr[, "1"]
+    } else {
+      pred_prob <- rep(0.5, length(test_pred))
+    }
   } else {
     test_pred <- NULL
     pred_prob <- NULL
