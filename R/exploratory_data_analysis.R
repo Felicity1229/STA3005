@@ -31,7 +31,7 @@
 #' # View the descriptive statistics
 #' print(eda_results$Descriptive_Statistics)
 #' }
-exploratory_data_analysis <- function(data, target_name = "Potability") {
+exploratory_data_analysis <- function(data, target_name) {
 
   # 1. Parameter Validation
   if (!(target_name %in% colnames(data))) {
