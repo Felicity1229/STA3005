@@ -21,6 +21,7 @@ Imports:
     ggplot2,
     reshape2,
     stats,
+    rlang,
     methods,
     utils,
     dplyr,

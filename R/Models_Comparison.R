@@ -11,7 +11,7 @@
 #'   The names of the list elements will be directly used as the model names in the
 #'   output tables and plot legends.
 #' @param positive_class A character string representing the positive class level.
-#'   Default is \code{"X1"}. This must strictly match one of the levels in \code{true_labels}.
+#'   Default is \code{"1"}. This must strictly match one of the levels in \code{true_labels}.
 #'
 #' @return A \code{data.frame} containing the computed evaluation metrics for all models,
 #'   with the following columns:
@@ -32,11 +32,12 @@
 #' @importFrom ggplot2 ggplot aes geom_tile geom_text scale_fill_gradient theme_minimal labs theme element_text facet_wrap geom_abline ggtitle geom_bar scale_fill_brewer element_rect
 #' @importFrom reshape2 melt
 #' @importFrom methods as
+#' @importFrom rlang .data
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # 1. Assume 'y_test' contains true labels (e.g., "X0", "X1")
+#' # 1. Assume 'y_test' contains true labels (e.g., "0", "1")
 #' # 2. Prepare the named list of model results
 #' my_models <- list(
 #'   "Decision Tree"  = list(predictions = dtr_preds, pred_prob = dtr_probs),
@@ -48,7 +49,7 @@
 #' final_comparison <- models_comparison(
 #'   true_labels = y_test,
 #'   models_list = my_models,
-#'   positive_class = "X1"
+#'   positive_class = "1"
 #' )
 #'
 #' # 4. View the numerical results
@@ -118,7 +119,7 @@ models_comparison <- function(true_labels, models_list, positive_class = "1") {
   print("Generating Metrics Bar Chart...")
   melted_df <- melt(metrics_df, id.vars = "Model", measure.vars = c("Accuracy", "F1_Score", "AUC"))
 
-  bar_plot <- ggplot(melted_df, aes(x = Model, y = value, fill = variable)) +
+  bar_plot <- ggplot(melted_df, aes(x = .data$Model, y = .data$value, fill = .data$variable)) +
     geom_bar(stat = "identity", position = "dodge", width = 0.7) +
     theme_minimal() +
     labs(title = "Model Performance Comparison", y = "Score", x = "") +
@@ -134,9 +135,9 @@ models_comparison <- function(true_labels, models_list, positive_class = "1") {
   print("Generating Faceted Confusion Matrix Heatmaps...")
   colnames(cm_data_all) <- c("Prediction", "Reference", "Freq", "Model")
 
-  heatmap_plot <- ggplot(cm_data_all, aes(x = Reference, y = Prediction, fill = Freq)) +
+  heatmap_plot <- ggplot(cm_data_all, aes(x = .data$Reference, y = .data$Prediction, fill = .data$Freq)) +
     geom_tile(color = "white") +
-    geom_text(aes(label = Freq), vjust = 0.5, fontface = "bold", size = 4) +
+    geom_text(aes(label = .data$Freq), vjust = 0.5, fontface = "bold", size = 4) +
     scale_fill_gradient(low = "#F0F8FF", high = "#4682B4") +
     theme_minimal() +
     labs(title = "Confusion Matrix Across Models", x = "Actual Class", y = "Predicted Class") +
@@ -150,16 +151,3 @@ models_comparison <- function(true_labels, models_list, positive_class = "1") {
 
   return(metrics_df)
 }
-
-# test
-# my_all_models <- list(
-#   "Decision Tree"   = dtr_result,
-#   "Neural Network"  = NN,
-#   "Random Forest"   = rf_result,
-#   "SVM"             = svm_result,
-#   "XGBoost"         = xgb_result
-# )
-#
-# final_comparison <- models_comparison(true_labels = y_test,
-#                                            models_list = my_all_models,
-#                                            positive_class = "X1")

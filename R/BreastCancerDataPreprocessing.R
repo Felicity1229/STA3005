@@ -20,13 +20,15 @@
 #'   \item{train_data}{Processed training data frame}
 #'   \item{test_data}{Processed test data frame}
 #'
+#' @importFrom stats model.matrix
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' result <- preprocessBreastCancerData("breast_cancer_dataset")
 #' X_train <- result$X_train
 #' y_train <- result$y_train
 #' }
-#' @export
 preprocessBreastCancerData <- function(train_data, train_ratio = 0.8) {
 
   # 1. Encode target variable Status (Alive -> 1, Dead -> 0)
