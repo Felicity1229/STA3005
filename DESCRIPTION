@@ -22,6 +22,7 @@ Imports:
     reshape2,
     stats,
     methods,
+    utils,
     dplyr,
     rpart,
     e1071,

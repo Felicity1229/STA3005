@@ -222,7 +222,7 @@ predict_rf_model <- function(trees, X) {
     model_name = "Random Forest",
     predictions = predictions,
     pred_prob = pred_prob,
-    model = rf_scratch
+    model = trees
   ))
 }
 

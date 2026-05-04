@@ -40,6 +40,7 @@ NULL
 #'   \item{model}{The trained SVM model object from e1071::svm()}
 #'
 #' @importFrom e1071 svm tune tune.control
+#' @importFrom stats model.matrix
 #'
 #' @examples
 #' \dontrun{

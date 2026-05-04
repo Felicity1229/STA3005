@@ -53,5 +53,5 @@ processed_data_visual(df, target_col = "Potability",
 
 }
 \seealso{
-\code{\link{Exploratory_Data_analysis}} for the EDA function
+\code{\link{exploratory_data_analysis}} for the EDA function
 }

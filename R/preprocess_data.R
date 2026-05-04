@@ -38,8 +38,9 @@ NULL
 #'   \item{min_vals}{Minimum values for each numeric feature (for normalization)}
 #'   \item{max_vals}{Maximum values for each numeric feature (for normalization)}
 #'
+#' @importFrom utils head
 #' @importFrom caTools sample.split
-#' @importFrom stats median quantile sd var
+#' @importFrom stats median quantile sd var cor
 #'
 #' @examples
 #' \dontrun{
