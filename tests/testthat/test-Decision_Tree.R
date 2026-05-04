@@ -1,6 +1,4 @@
-# =====================================================================
 # 辅助函数：生成基础干净的测试数据，避免在每个测试块里重复写太多代码
-# =====================================================================
 generate_dummy_data <- function(n_train = 50, n_test = 20) {
   set.seed(123)
   X_train <- data.frame(f1 = rnorm(n_train), f2 = runif(n_train))
@@ -10,9 +8,7 @@ generate_dummy_data <- function(n_train = 50, n_test = 20) {
   return(list(X_train = X_train, y_train = y_train, X_test = X_test, y_test = y_test))
 }
 
-# =====================================================================
 # 场景 A：零方差 (Zero Variance)
-# =====================================================================
 test_that("Scenario A: Handles zero-variance columns safely", {
   data <- generate_dummy_data()
   # 故意注入一列全是 0 的零方差特征
@@ -27,9 +23,7 @@ test_that("Scenario A: Handles zero-variance columns safely", {
   expect_s3_class(res$model, "rpart")
 })
 
-# =====================================================================
 # 场景 B：类型不符 (Type Mismatch)
-# =====================================================================
 test_that("Scenario B: Auto-converts numeric targets to factors", {
   data <- generate_dummy_data()
   # 剥夺 Factor 身份，退化为纯数值
@@ -44,9 +38,7 @@ test_that("Scenario B: Auto-converts numeric targets to factors", {
   expect_s3_class(res$predictions, "factor")
 })
 
-# =====================================================================
 # 场景 C：极度不平衡 (Extreme Imbalance)
-# =====================================================================
 test_that("Scenario C: Generates confusion matrix with extreme test set imbalance", {
   data <- generate_dummy_data()
   # 让测试集只有 "0" 这一种标签
@@ -61,9 +53,7 @@ test_that("Scenario C: Generates confusion matrix with extreme test set imbalanc
   expect_true(all(res$pred_prob >= 0 & res$pred_prob <= 1))
 })
 
-# =====================================================================
 # 场景 D：存在缺失值 (Missing Values)
-# =====================================================================
 test_that("Scenario D: Handles missing values (NA) in test set", {
   data <- generate_dummy_data()
   # 在测试集中随机注入 NA
@@ -79,9 +69,7 @@ test_that("Scenario D: Handles missing values (NA) in test set", {
   expect_length(res$predictions, nrow(data$X_test))
 })
 
-# =====================================================================
 # 场景 E：特征维度错乱 (Feature Dimension Mismatch)
-# =====================================================================
 test_that("Scenario E: Errors on missing features, handles scrambled columns", {
   data <- generate_dummy_data()
 
@@ -101,9 +89,7 @@ test_that("Scenario E: Errors on missing features, handles scrambled columns", {
   })
 })
 
-# =====================================================================
 # 场景 F：单行降维陷阱 (The 1-Row Trap)
-# =====================================================================
 test_that("Scenario F: Survives the 1-row data frame trap", {
   data <- generate_dummy_data()
 
@@ -120,9 +106,7 @@ test_that("Scenario F: Survives the 1-row data frame trap", {
   expect_length(res$pred_prob, 1)
 })
 
-# =====================================================================
 # 场景 G：未见过的类别 (Unseen Factor Levels)
-# =====================================================================
 test_that("Scenario G: Errors out on unseen factor levels in target", {
   data <- generate_dummy_data()
 
