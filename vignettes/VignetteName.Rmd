@@ -165,7 +165,7 @@ evaluate_models(mushroom_data_res$y_test, mushroom_dt_model, "1")
 
 ```{r}
 # mushroom_models = list(mushroom_dt_model, )
-models_comparison(mushroom_data_res$y_test, mushroom_models, "1")
+# models_comparison(mushroom_data_res$y_test, mushroom_models, "1")
 ```
 
 
