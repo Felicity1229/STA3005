@@ -63,7 +63,7 @@ train_svm <- function(X_train, y_train,
                             kernel_type = "radial",
                             tune = TRUE) {
 
-  # 1. 处理缺失值
+  # Missing value in case
   fill_na <- function(df) {
     for (i in 1:ncol(df)) {
       if (any(is.na(df[, i]))) {
@@ -71,7 +71,7 @@ train_svm <- function(X_train, y_train,
           median_val <- median(df[, i], na.rm = TRUE)
           df[is.na(df[, i]), i] <- median_val
         } else {
-          # 对非数值列，用众数填充
+          # For non-numeric columns, fill with the mode value
           mode_val <- names(sort(table(df[, i]), decreasing = TRUE))[1]
           df[is.na(df[, i]), i] <- mode_val
         }
@@ -83,7 +83,7 @@ train_svm <- function(X_train, y_train,
   # Combine training and test data to ensure consistent dummy variable encoding
   valid_cols <- sapply(X_train, function(x) length(unique(na.omit(x))) > 1)
 
-  # 如果所有列都是零方差，保留至少一列
+  # If all columns have zero variance, retain at least one column
   if (sum(valid_cols) == 0) {
     valid_cols <- rep(TRUE, ncol(X_train))
   }
@@ -117,7 +117,7 @@ train_svm <- function(X_train, y_train,
   y_train <- as.factor(y_train)
   if (!is.null(y_test)) {
     y_test <- as.factor(y_test)
-    # 检查测试集是否有训练集中未出现的水平
+    # Check whether the test set contains any levels that did not appear in the training set
     train_levels <- levels(y_train)
     test_levels <- levels(y_test)
 
