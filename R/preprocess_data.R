@@ -90,7 +90,7 @@ pre_process_data <- function(data, tag_column, split_ratio = 0.7, seed = 3) {
 
   if (sum(numeric_cols) >= 2) {  # Need at least 2 numeric columns
     cor_matrix <- cor(data[, numeric_cols])
-    print(cor_matrix)
+    # print(cor_matrix)
   } else {
     print("The correlation matrix cannot be calculated.")
   }

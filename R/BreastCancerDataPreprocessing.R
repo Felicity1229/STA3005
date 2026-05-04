@@ -89,10 +89,10 @@ preprocessBreastCancerData <- function(train_data, train_ratio = 0.8) {
   train_data$A.Stage <- ifelse(train_data$A.Stage == "Regional", 1, 0)
 
   # 12. Feature engineering: Positive_Ratio
-  train_data$Positive_Ratio <- train_data$Reginol.Node.Positive /
+  train_data$Positive_Ratio <- train_data$Regional.Node.Positive /
     train_data$Regional.Node.Examined
   train_data$Regional.Node.Examined <- NULL
-  train_data$Reginol.Node.Positive <- NULL
+  train_data$Regional.Node.Positive <- NULL
 
   # 13. Z-score scaling for continuous variables
   train_data$Age <- as.numeric(scale(train_data$Age))

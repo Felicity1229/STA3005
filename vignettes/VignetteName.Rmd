@@ -18,18 +18,32 @@ knitr::opts_chunk$set(
 library(ClassifyR)
 ```
 
+# Package Overview
+
+Our package is designed for binary classification problems. To demonstrate the complete workflow, we employ **four different datasets** and organize our **12 functions** into three categories:
+
+1.  Data Preprocessing and Visualization
+2.  Model Training
+3.  Model Evaluation and Result Analysis
+
+## Data Preprocessing
+Here we load our prepared data sets and load them like this.
 ```{r}
 data("breast_cancer_dataset")
 data("diabetes_dataset")
 data("heart_dataset")
 data("mushroom_dataset")
+head(breast_cancer_dataset)
+head(diabetes_dataset)
+head(heart_dataset)
+head(mushroom_dataset)
 ```
+Then we use the function in preprocess.R to handle missing value, do correlation analysis, split train-test sets, do Min-Max normalization. 
+```{r}
+heart_data_res = pre_process_data(heart_dataset, 14)
+diabetes_data_res = pre_process_data(diabetes_dataset,8)
+mushroom_data_res = pre_process_data(mushroom_dataset,1)
 
-
-
-
-
-
-
-
+breast_cancer_data_res = preprocessBreastCancerData(breast_cancer_dataset)
+```
 
