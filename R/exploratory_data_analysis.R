@@ -48,7 +48,7 @@ exploratory_data_analysis <- function(data, target_name) {
   numeric_data <- select(features_only, where(is.numeric))
 
   if (ncol(numeric_data) == 0) {
-    warning("No numeric features found in the dataset for descriptive statistics.")
+    message("No numeric features found in the dataset for descriptive statistics.")
   }
 
   # 3. Detailed Descriptive Statistics
