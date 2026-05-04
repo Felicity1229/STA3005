@@ -77,9 +77,9 @@ pre_process_data <- function(data, tag_column, split_ratio = 0.7, seed = 3) {
       data[[col]][is.na(data[[col]])] <- mean(data[[col]], na.rm = TRUE)
     }
 
-    print("Filled:")
-    print(paste(cols_with_na, collapse = ", "))
-    print(colSums(is.na(data)))  # Verify no missing values remain
+    # print("Filled:")
+    # print(paste(cols_with_na, collapse = ", "))
+    # print(colSums(is.na(data)))  # Verify no missing values remain
   }else{
     print("No missing value")
   }
@@ -88,16 +88,26 @@ pre_process_data <- function(data, tag_column, split_ratio = 0.7, seed = 3) {
   # Identify numeric columns for correlation calculation
   numeric_cols <- sapply(data, is.numeric)
 
-  if (sum(numeric_cols) >= 2) {  # Need at least 2 numeric columns
-    cor_matrix <- cor(data[, numeric_cols])
-    # print(cor_matrix)
+  if (sum(numeric_cols) >= 2) {
+    numeric_data <- data[, numeric_cols, drop = FALSE]
+    # Avoid variance = 0
+    variance_cols <- sapply(numeric_data, var, na.rm = TRUE) > 0
+    numeric_data <- numeric_data[, variance_cols, drop = FALSE]
+
+    if (ncol(numeric_data) >= 2) {
+      cor_matrix <- cor(numeric_data, use = "complete.obs")
+    } else {
+      cor_matrix <- NA
+      print("Not enough numeric columns with variance for correlation calculation.")
+    }
   } else {
+    cor_matrix <- NA
     print("The correlation matrix cannot be calculated.")
   }
 
   # 5. Check target variable distribution
   # Display frequency table of the target variable
-  print(table(data[[tag_col_name]]))
+  # print(table(data[[tag_col_name]]))
 
   # 6. Split data into training and test sets
   set.seed(seed)
