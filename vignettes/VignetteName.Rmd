@@ -85,7 +85,15 @@ processed_data_visual(breast_cancer_data_res$train_data, target_col = "Status")
 processed_data_visual(diabetes_data_res$train_data, target_col = "Outcome")
 ```
 
+<<<<<<< HEAD
+```{r}
+processed_data_visual(diabetes_data_res$train_data, target_col = "Outcome")
+```
+
+Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. Here we make a table to guide you to choose the proper model that suits your valuable data set.
+=======
 Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. In the next part we make a table to guide you to choose the proper model that suits your valuable data set.
+>>>>>>> 98605c4bb7380b4a425a37621a3632edbd51e55f
 
 # 4. Model Suitability for Different Training Sets
 
@@ -291,8 +299,6 @@ Performance Analysis and Comparison: Because the Mushroom dataset relies heavily
 
 ## 6-3. Heart Disease dataset
 
-For the heart disease model:
-
 ```{r}
 heart_models_com = list(
   "Neural Network" = heart_NN_result,
@@ -318,6 +324,7 @@ diabetes_models_com = list(
 models_comparison(diabetes_data_res$y_test, diabetes_models_com, "1")
 ```
 Performance Analysis and Comparison: Overall, SVM and random Forest are best. SVM provides the most balanced performance across all core metrics. Random Forest minimizes false positives and making it highly reliable when predicting a positive diabetes case. XGBoost identifies a large majority of actual positive cases. If the medical priority is to minimize missed diagnoses, XGBoost is an excellent choice, despite generating more false positives. Decision Tree performs well and proves that simple, interpretable rule-based splits are quite effective for the clinical thresholds inherent in this noisy dataset. Neural Network fails on this dataset. Due to overly aggressive tuning, the model failed to converge and acts almost as a constant predictor. This inflates recall but completely destroys precision.
+
 
 # 7. The advantage of our package
 
