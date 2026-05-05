@@ -78,17 +78,11 @@ breast_data_exploratory_res = exploratory_data_analysis(breast_cancer_data_res$t
 We can further use visualization helper function to better understand our datasets.
 
 ```{r}
-<<<<<<< HEAD
-processed_data_visual(breast_cancer_data_res$train_data,target_col = "Status")
-
-## This might take a while
-=======
 # Breast Cancer Dataset
 processed_data_visual(breast_cancer_data_res$train_data, target_col = "Status")
 
 # Diabetes Dataser
 processed_data_visual(diabetes_data_res$train_data, target_col = "Outcome")
->>>>>>> 55d3df35f6d8dd6693019749b99debb5bb7cd3d9
 ```
 
 Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. In the next part we make a table to guide you to choose the proper model that suits your valuable data set.
