@@ -34,7 +34,7 @@ Target users
 To install this package, please use the command below and then load the package
 
 ```{r install-pkg, eval = FALSE}
-install.packages("ClassifyR")
+install.packages("path/to/YourPackage_1.0.0.tar.gz", repos = NULL, type = "source")
 ```
 
 ```{r setup}
