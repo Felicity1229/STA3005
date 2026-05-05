@@ -267,6 +267,7 @@ diabetes_rf_pred_prob <- diabetes_rf_result$pred_prob
 ```{r}
 evaluate_models(breast_cancer_data_res$y_test, bc_NN_prediction_res,"1")
 ```
+Performance Analysis: The single-model evaluation function `evaluate_models` provides a comprehensive view of the Neural Network's performance. The overall Accuracy and F1-Score are robust. The model achieved a high Area Under the Curve (AUC) and the heatmap (confusion matrix) reveals a large proportion of True Positives and True Negatives, indicating a strong ability to distinguish between classes. 
 
 ## 6-2. Mushroom dataset
 
@@ -286,6 +287,7 @@ mushroom_models_com = list(
 
 models_comparison(mushroom_data_res$y_test, mushroom_models_com, "1")
 ```
+Performance Analysis and Comparison: Because the Mushroom dataset relies heavily on categorical logic rules (e.g., odor, cap shape), both models perform well. While the standalone Decision Tree provides excellent interpretability, the Random Forest model mitigates the risk of overfitting by aggregating multiple trees. Consequently, the Random Forest output demonstrates higher stability and a near-perfect F1-Score, proving it to be the superior algorithm for this specific data structure.
 
 ## 6-3. Heart Disease dataset
 
@@ -301,6 +303,7 @@ heart_models_com = list(
   )
 models_comparison(heart_data_res$y_test, heart_models_com, "1")
 ```
+Performance Analysis and Comparison: Random forest strikes the best balance between classes in the confusion matrix and achieves the highest overall accuracy and AUC, demonstrating strong class separation. XGBoost excels at identifying actual positive cases, which is highly desirable in medical contexts to avoid missing sick patients. However, this high sensitivity comes at the expense of lower precision (more false positives). SVM delivers highly balanced and competitive results. It achieves the highest precision, meaning its positive predictions are the most reliable among all models. Decision Tree performs moderately well across all metrics. While its overall performance is slightly edged out by ensemble methods, it provides a transparent and easily interpretable baseline. Neural Network struggles on this dataset, lagging behind in all major metrics. This indicates that the current architecture or hyperparameters require further tuning to effectively capture the non-linear patterns here.
 
 ## 6-4. Diabetes Dataset
 
@@ -314,6 +317,7 @@ diabetes_models_com = list(
   )
 models_comparison(diabetes_data_res$y_test, diabetes_models_com, "1")
 ```
+Performance Analysis and Comparison: Overall, SVM and random Forest are best. SVM provides the most balanced performance across all core metrics. Random Forest minimizes false positives and making it highly reliable when predicting a positive diabetes case. XGBoost identifies a large majority of actual positive cases. If the medical priority is to minimize missed diagnoses, XGBoost is an excellent choice, despite generating more false positives. Decision Tree performs well and proves that simple, interpretable rule-based splits are quite effective for the clinical thresholds inherent in this noisy dataset. Neural Network fails on this dataset. Due to overly aggressive tuning, the model failed to converge and acts almost as a constant predictor. This inflates recall but completely destroys precision.
 
 # 7. The advantage of our package
 
