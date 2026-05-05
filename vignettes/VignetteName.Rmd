@@ -32,10 +32,11 @@ Target users
 # 2. Package Installation
 
 To install this package, please use the command below and then load the package
+```{r install-pkg, eval = FALSE}
+install.packages("ClassifyR")
+```
 
 ```{r setup}
-install.packages("ClassifyR")
-
 library(ClassifyR)
 ```
 
@@ -83,16 +84,7 @@ processed_data_visual(breast_cancer_data_res$train_data, target_col = "Status")
 # Diabetes Dataser
 processed_data_visual(diabetes_data_res$train_data, target_col = "Outcome")
 ```
-
-<<<<<<< HEAD
-```{r}
-processed_data_visual(diabetes_data_res$train_data, target_col = "Outcome")
-```
-
-Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. Here we make a table to guide you to choose the proper model that suits your valuable data set.
-=======
 Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. In the next part we make a table to guide you to choose the proper model that suits your valuable data set.
->>>>>>> 98605c4bb7380b4a425a37621a3632edbd51e55f
 
 # 4. Model Suitability for Different Training Sets
 
