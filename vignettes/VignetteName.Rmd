@@ -68,6 +68,10 @@ processed_data_visual(breast_cancer_data_res$train_data,target_col = "Status")
 ##
 ```
 
+```{r}
+processed_data_visual(diabetes_data_res$train_data, target_col = "Outcome")
+```
+
 Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. Here we make a table to guide you to choose the proper model that suits your valuable data set.
 
 ## Model Suitability for Different Training Sets
@@ -178,7 +182,7 @@ diabetes_rf_pred_prob <- diabetes_rf_result$pred_prob
 For the breast cancer data set
 
 ```{r}
-evaluate_models(breast_cancer_data_res$y_test,bc_NN_prediction_res,"1")
+evaluate_models(breast_cancer_data_res$y_test, bc_NN_prediction_res,"1")
 # 这里是不是可以加一些对于数据的分析
 ```
 
@@ -216,9 +220,9 @@ models_comparison(heart_data_res$y_test, heart_models_com, "1")
 ```
 For the diabetes models:
 ```{r}
-evaluate_models(diabetes_data_res$y_test,diabetes_svm_result,"1")
-evaluate_models(diabetes_data_res$y_test,diabetes_rf_result,"1")
-evaluate_models(diabetes_data_res$y_test,diabetes_xgb_result,"1")
+evaluate_models(diabetes_data_res$y_test,diabetes_svm_result, "1")
+evaluate_models(diabetes_data_res$y_test,diabetes_rf_result, "1")
+evaluate_models(diabetes_data_res$y_test,diabetes_xgb_result, "1")
 
 diabetes_models_com = list(
   "XGBoost" = list(predictions = diabetes_xgb_result$predictions,
@@ -232,7 +236,6 @@ models_comparison(diabetes_data_res$y_test, diabetes_models_com, "1")
 
 
 
->>>>>>> 8e8f7f8b6abd56875d973a6e3d84a13e0dba7679
 ## The advantage of our package:
 
 1.  It demonstrates the complete pipeline for binary classification, including data preparation, data cleaning, exploratory data analysis, model training, prediction making, model comparison, and data/model visualization.
