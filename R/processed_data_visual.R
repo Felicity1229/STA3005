@@ -120,13 +120,13 @@ processed_data_visual <- function(df,
       ggtitle(paste("Target Distribution:", target_col))
 
     print(pie_chart)
-    cat("\n=== Pie Chart of Target Distribution ===\n\n")
+    # cat("\n=== Pie Chart of Target Distribution ===\n\n")
   }
 
   # ========== 2. Box Plots for Numeric Features ==========
 
   if (length(numeric_features) > 0) {
-    cat("\n=== Box Plots by", target_col, "===\n\n")
+    # cat("\n=== Box Plots by", target_col, "===\n\n")
 
     box_plot_indicator <- function(indicator) {
       p <- ggplot(df, aes(x = factor(.data[[target_col]]),
@@ -156,7 +156,7 @@ processed_data_visual <- function(df,
   # ========== 3. Histograms for Numeric Features ==========
 
   if (length(numeric_features) > 0) {
-    cat("\n=== Histograms by", target_col, "===\n\n")
+    # cat("\n=== Histograms by", target_col, "===\n\n")
 
     hist_plot_indicator <- function(indicator) {
       p <- ggplot(df, aes(x = .data[[indicator]],
@@ -213,7 +213,7 @@ processed_data_visual <- function(df,
 
   # Generate correlation plot
   if (!is.null(corr_cols) && length(corr_cols) >= 2) {
-    cat("\n=== Correlation Matrix ===\n\n")
+    # cat("\n=== Correlation Matrix ===\n\n")
 
     # Check if all selected columns are numeric
     numeric_corr_cols <- corr_cols[sapply(df[corr_cols], is.numeric)]
@@ -230,7 +230,8 @@ processed_data_visual <- function(df,
         lower = list(continuous = wrap("points", size = 0.8, alpha = 0.3)),
         diag = list(continuous = wrap("densityDiag", alpha = 0.6)),
         upper = list(continuous = wrap("cor", size = 3, stars = FALSE)),
-        legend = 5
+        legend = 5,
+        progress = FALSE
       ) +
         theme_bw() +
         theme(plot.title = element_text(hjust = 0.5, face = "bold"))

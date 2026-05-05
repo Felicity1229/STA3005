@@ -64,8 +64,11 @@ breast_data_exploratory_res = exploratory_data_analysis(breast_cancer_data_res$t
 We can further use visualization helper function to better understand our data
 
 ```{r}
-processed_data_visual(breast_cancer_data_res$train_data,target_col = "Status")
-##
+# Breast Cancer Dataset
+processed_data_visual(breast_cancer_data_res$train_data, target_col = "Status")
+
+# Diabetes Dataser
+processed_data_visual(diabetes_data_res$train_data, target_col = "Outcome")
 ```
 
 Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. Here we make a table to guide you to choose the proper model that suits your valuable data set.
@@ -190,6 +193,7 @@ evaluate_models(mushroom_data_res$y_test, mushroom_dt_model, "1")
 ```
 
 Since we use 2 different models for the mushroom prediction, we can use the function below to compare these 2 models
+
 ```{r}
 mushroom_models_com = list(
   "Decision Tree" = list(predictions = mushroom_dt_model$predictions,
@@ -199,7 +203,9 @@ mushroom_models_com = list(
 
 models_comparison(mushroom_data_res$y_test, mushroom_models_com, "1")
 ```
+
 For the heart disease model:
+
 ```{r}
 evaluate_models(heart_data_res$y_test,heart_svm_result,"1")
 evaluate_models(heart_data_res$y_test,heart_rf_result,"1")
@@ -214,7 +220,9 @@ heart_models_com = list(
                       pred_prob = heart_svm_result$pred_prob))
 models_comparison(heart_data_res$y_test, heart_models_com, "1")
 ```
+
 For the diabetes models:
+
 ```{r}
 evaluate_models(diabetes_data_res$y_test,diabetes_svm_result,"1")
 evaluate_models(diabetes_data_res$y_test,diabetes_rf_result,"1")
@@ -230,9 +238,6 @@ diabetes_models_com = list(
 models_comparison(diabetes_data_res$y_test, diabetes_models_com, "1")
 ```
 
-
-
->>>>>>> 8e8f7f8b6abd56875d973a6e3d84a13e0dba7679
 ## The advantage of our package:
 
 1.  It demonstrates the complete pipeline for binary classification, including data preparation, data cleaning, exploratory data analysis, model training, prediction making, model comparison, and data/model visualization.
