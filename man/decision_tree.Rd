@@ -36,8 +36,8 @@ Finally, it evaluates the model on a testing set and plots the tree structure.
 }
 \examples{
 \dontrun{
-# Assuming X_train, y_train, X_test, and y_test are already prepared
-dt_results <- decision_tree(X_train, y_train, X_test, y_test)
+# Assuming X_train_norm, y_train, X_test_norm, and y_test are already prepared
+dt_results <- decision_tree(X_train_norm, y_train, X_test_norm, y_test)
 
 # View the overall accuracy
 print(dt_results$metrics$overall["Accuracy"])

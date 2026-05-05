@@ -1,10 +1,13 @@
 ---
-title: "VignetteName"
+title: "Guide For using ClassifyR Package"
+author: "Yibing Zhang, Zijin Li, Xinyi Hu"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{VignetteName}
+  %\VignetteIndexEntry{Guide For using ClassifyR Package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+output: rmarkdown::html_vignette
 ---
 
 ```{r, include = FALSE}
@@ -14,11 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(ClassifyR)
-```
-
-# Package Overview
+# 1. Package Overview
 
 Our package is designed for binary classification problems. To demonstrate the complete workflow, we employ **four different datasets** and organize our **12 functions** into three categories:
 
@@ -26,9 +25,24 @@ Our package is designed for binary classification problems. To demonstrate the c
 2.  Model Training
 3.  Model Evaluation and Result Analysis
 
-## Data Preprocessing
+Target users
 
-Here we load our prepared data sets and load them like this.
+- Students learning about machine learning classification algorithms
+- Researchers comparing multiple classification approaches on some dataset
+
+# 2. Package Installation
+
+To install this package, please use the command below and then load the package
+
+```{r setup}
+install.packages("ClassifyR")
+
+library(ClassifyR)
+```
+
+# 3. Data Preprocessing
+
+Here we load our prepared datasets like this. We prepare 4 different datasets for your reference, and you can use your collected datasets.
 
 ```{r}
 data("breast_cancer_dataset")
@@ -41,7 +55,7 @@ head(heart_dataset)
 head(mushroom_dataset)
 ```
 
-Then we use the function in preprocess.R to handle missing value, do correlation analysis, split train-test sets, do Min-Max normalization.
+Then we use the function in preprocess.R to handle missing value, conduct correlation analysis, split train-test sets, conduct Min-Max normalization.
 
 ```{r}
 heart_data_res = pre_process_data(heart_dataset, 14)
@@ -61,20 +75,27 @@ heart_data_exploratory_res = exploratory_data_analysis(heart_data_res$train_data
 breast_data_exploratory_res = exploratory_data_analysis(breast_cancer_data_res$train_data,target_name = "Status")
 ```
 
-We can further use visualization helper function to better understand our data
+We can further use visualization helper function to better understand our datasets.
 
 ```{r}
-processed_data_visual(breast_cancer_data_res$train_data,target_col = "Status")
-##
+# Breast Cancer Dataset
+processed_data_visual(breast_cancer_data_res$train_data, target_col = "Status")
+
+# Diabetes Dataser
+processed_data_visual(diabetes_data_res$train_data, target_col = "Outcome")
 ```
 
+<<<<<<< HEAD
 ```{r}
 processed_data_visual(diabetes_data_res$train_data, target_col = "Outcome")
 ```
 
 Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. Here we make a table to guide you to choose the proper model that suits your valuable data set.
+=======
+Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. In the next part we make a table to guide you to choose the proper model that suits your valuable data set.
+>>>>>>> 98605c4bb7380b4a425a37621a3632edbd51e55f
 
-## Model Suitability for Different Training Sets
+# 4. Model Suitability for Different Training Sets
 
 The following table provides a brief guideline on the characteristics of training sets that are generally well-suited for each of the five machine learning models implemented in the `ClassifyR` package.
 
@@ -88,7 +109,11 @@ The following table provides a brief guideline on the characteristics of trainin
 
 For the 4 data sets we prepared in this package, we use Neural Network for breast cancer data set. The parameters in this trainModel function should adjust your data set, you need to choose appropriate hidden neuron numbers and lr.
 
-## Model Training
+# 5. Model Training
+
+## 5-1. Breast Cancer DataSet
+
+For this dataset, we choose the neural network model.
 
 ```{r}
 bc_model = trainModel(X=breast_cancer_data_res$X_train,y=breast_cancer_data_res$y_train,num_iteration = 5000,hidden_neurons = 15,lr=0.01,verbose = TRUE) # using verbose for training detail, you can turn it off by setting it to FALSE
@@ -103,7 +128,9 @@ bc_NN_prediction_res= NN_performance(test_data = breast_cancer_data_res$X_test,h
 
 ```
 
-For Mushroom data set, we use
+## 5-2. Mushroom Dataset
+
+For Mushroom data set, we use 2 models: random forests and decision tree.
 
 ```{r}
 mushroom_rf_model <- train_rf(
@@ -119,9 +146,40 @@ mushroom_rf_result <- predict_rf_model(mushroom_rf_model, mushroom_data_res$X_te
 mushroom_dt_model = decision_tree(mushroom_data_res$X_train_norm, mushroom_data_res$y_train, mushroom_data_res$X_test_norm, mushroom_data_res$y_test, cp = 0.01)
 ```
 
-For Heart disease data set, we use
+## 5-3. Heart Disease dataset
+
+For Heart disease data set, we use 5 models, they are neural network, decision tree, XGBoost, SVM and random forests.
 
 ```{r}
+# Neural Network
+heart_NN_model = trainModel(
+  X = t(as.matrix(heart_data_res$X_train_norm)),
+  y = t(as.matrix(heart_data_res$y_train)),
+  num_iteration = 7000,
+  hidden_neurons = 10,
+  lr = 0.3,
+  verbose = FALSE
+  ) 
+plot(heart_NN_model$cost_hist, type = "l", 
+     xlab = "Iteration", ylab = "Cost",
+     main = "Training Loss",
+     col="red")
+heart_NN_result= NN_performance(
+  test_data = t(as.matrix(heart_data_res$X_test)),
+  hidden_neurons = 10,
+  model_name = "Neural Network",
+  train_model = heart_NN_model
+  )
+
+# Decision Tree
+heart_dtr_result <- decision_tree(
+  X_train = heart_data_res$X_train_norm,
+  y_train = heart_data_res$y_train,
+  X_test  = heart_data_res$X_test_norm,
+  y_test  = heart_data_res$y_test
+)
+
+# XGBoost
 heart_xgb_result <- train_xgb(
   X_train = heart_data_res$X_train_norm,
   y_train = heart_data_res$y_train,
@@ -129,6 +187,7 @@ heart_xgb_result <- train_xgb(
   y_test  = heart_data_res$y_test
 )
 
+# SVM
 heart_svm_result <- train_svm(
   X_train = heart_data_res$X_train,
   y_train = heart_data_res$y_train,
@@ -137,19 +196,50 @@ heart_svm_result <- train_svm(
   tune = TRUE
 )
 
+# Random Forest
 heart_rf_model <- train_rf(
   X = heart_data_res$X_train_norm,
   y = heart_data_res$y_train,
   n_trees = 20,
   max_depth = 5
 )
-
 heart_rf_result <- predict_rf_model(heart_rf_model, heart_data_res$X_test_norm)
 ```
 
-For Diabetes data set, we use
+## 5-4. Diabetes dataset
+
+For Diabetes data set, we use 5 models, they are neural network, decision tree, XGBoost, SVM and random forests.
 
 ```{r}
+# Neural Network
+diabetes_NN_model = trainModel(
+  X = t(as.matrix(diabetes_data_res$X_train_norm)),
+  y = t(as.matrix(diabetes_data_res$y_train)),
+  num_iteration = 10000,
+  hidden_neurons = 6,
+  lr=0.6,
+  verbose = FALSE
+  ) 
+plot(diabetes_NN_model$cost_hist, type = "l", 
+     xlab = "Iteration", ylab = "Cost",
+     main = "Training Loss",
+     col="red")
+diabetes_NN_result = NN_performance(
+  test_data = t(as.matrix(diabetes_data_res$X_test)),
+  hidden_neurons = 6,
+  model_name = "Neural Network",
+  train_model = diabetes_NN_model
+  )
+
+# Decision Tree
+diabetes_dtr_result <- decision_tree(
+  X_train = diabetes_data_res$X_train_norm,
+  y_train = diabetes_data_res$y_train,
+  X_test  = diabetes_data_res$X_test_norm,
+  y_test  = diabetes_data_res$y_test
+)
+
+# XGBoost
 diabetes_xgb_result <- train_xgb(
   X_train = diabetes_data_res$X_train_norm,
   y_train = diabetes_data_res$y_train,
@@ -157,6 +247,7 @@ diabetes_xgb_result <- train_xgb(
   y_test  = diabetes_data_res$y_test
 )
 
+# SVM
 diabetes_svm_result <- train_svm(
   X_train = diabetes_data_res$X_train,
   y_train = diabetes_data_res$y_train,
@@ -165,28 +256,27 @@ diabetes_svm_result <- train_svm(
   tune = TRUE
 )
 
+# Random Forest
 diabetes_rf_model <- train_rf(
   X = diabetes_data_res$X_train_norm,
   y = diabetes_data_res$y_train,
   n_trees = 20,
   max_depth = 5
 )
-
 diabetes_rf_result <- predict_rf_model(diabetes_rf_model, diabetes_data_res$X_test_norm)
 diabetes_rf_predictions <- diabetes_rf_result$predictions
 diabetes_rf_pred_prob <- diabetes_rf_result$pred_prob
 ```
 
-## Model Evaluation and Result Analysis
+# 6. Model Evaluation and Result Analysis
 
-For the breast cancer data set
+## 6-1. Breast Cancer dataset
 
 ```{r}
 evaluate_models(breast_cancer_data_res$y_test, bc_NN_prediction_res,"1")
-# 这里是不是可以加一些对于数据的分析
 ```
 
-For Mushroom data set
+## 6-2. Mushroom dataset
 
 ```{r}
 evaluate_models(mushroom_data_res$y_test, mushroom_rf_result,"1")
@@ -194,6 +284,7 @@ evaluate_models(mushroom_data_res$y_test, mushroom_dt_model, "1")
 ```
 
 Since we use 2 different models for the mushroom prediction, we can use the function below to compare these 2 models
+
 ```{r}
 mushroom_models_com = list(
   "Decision Tree" = list(predictions = mushroom_dt_model$predictions,
@@ -203,40 +294,35 @@ mushroom_models_com = list(
 
 models_comparison(mushroom_data_res$y_test, mushroom_models_com, "1")
 ```
-For the heart disease model:
-```{r}
-evaluate_models(heart_data_res$y_test,heart_svm_result,"1")
-evaluate_models(heart_data_res$y_test,heart_rf_result,"1")
-evaluate_models(heart_data_res$y_test,heart_xgb_result,"1")
 
+## 6-3. Heart Disease dataset
+
+```{r}
 heart_models_com = list(
-  "XGBoost" = list(predictions = heart_xgb_result$predictions,
-                         pred_prob=heart_xgb_result$pred_prob),
-  "Random Forest" = list(predictions=heart_rf_result$predictions,
-                         pred_prob = heart_rf_result$pred_prob),
-  "SVM Result" = list(predictions=heart_svm_result$predictions,
-                      pred_prob = heart_svm_result$pred_prob))
+  "Neural Network" = heart_NN_result,
+  "Decision Tree" = heart_dtr_result,
+  "XGBoost" = heart_xgb_result,
+  "Random Forest" = heart_rf_result,
+  "SVM Result" = heart_svm_result
+  )
 models_comparison(heart_data_res$y_test, heart_models_com, "1")
 ```
-For the diabetes models:
-```{r}
-evaluate_models(diabetes_data_res$y_test,diabetes_svm_result, "1")
-evaluate_models(diabetes_data_res$y_test,diabetes_rf_result, "1")
-evaluate_models(diabetes_data_res$y_test,diabetes_xgb_result, "1")
 
+## 6-4. Diabetes Dataset
+
+```{r}
 diabetes_models_com = list(
-  "XGBoost" = list(predictions = diabetes_xgb_result$predictions,
-                         pred_prob=diabetes_xgb_result$pred_prob),
-  "Random Forest" = list(predictions=diabetes_rf_result$predictions,
-                         pred_prob = diabetes_rf_result$pred_prob),
-  "SVM Result" = list(predictions=diabetes_svm_result$predictions,
-                      pred_prob = diabetes_svm_result$pred_prob))
+  "Neural Network" = diabetes_NN_result,
+  "Decision Tree" = diabetes_dtr_result,
+  "XGBoost" = diabetes_xgb_result,
+  "Random Forest" = diabetes_rf_result,
+  "SVM Result" = diabetes_svm_result
+  )
 models_comparison(diabetes_data_res$y_test, diabetes_models_com, "1")
 ```
 
 
-
-## The advantage of our package:
+# 7. The advantage of our package
 
 1.  It demonstrates the complete pipeline for binary classification, including data preparation, data cleaning, exploratory data analysis, model training, prediction making, model comparison, and data/model visualization.
 
@@ -244,7 +330,7 @@ models_comparison(diabetes_data_res$y_test, diabetes_models_com, "1")
 
 3.  Well-organized helper functions provide a clear and accessible guide for machine learning and R language learners on how to use our package effectively.
 
-## The points learnt in this course:
+# 8. The points learnt in this course
 
 1.  R Function Development: How to design, implement, and structure R functions with proper parameters, error handling, and return values.
 
@@ -265,3 +351,27 @@ models_comparison(diabetes_data_res$y_test, diabetes_models_com, "1")
 9.  Version Control & Collaboration: How to use Git and GitHub for version control and collaborative package development.
 
 10. Testing & Quality Assurance: How to write unit tests using testthat and perform package checks to ensure code reliability and robustness.
+
+# 9. Conclusion
+
+The ClassifyR package provides a comprehensive and user-friendly framework for binary classification tasks, integrating essential steps from data preprocessing to model evaluation and comparison. The package implements five widely-used machine learning algorithms—Support Vector Machine (SVM), Decision Tree, Random Forest, XGBoost, and Neural Network—allowing users to apply and compare multiple approaches on their datasets with ease.
+
+Key features of the package include:
+
+Streamlined data preprocessing: Functions for handling missing values, correlation analysis, train-test splitting, and Min-Max normalization ensure that datasets are properly prepared before model training.
+
+Exploratory data analysis and visualization: Built-in functions enable users to understand data distributions and feature relationships through statistical summaries and publication-quality visualizations.
+
+Multiple modeling approaches: Five distinct classification algorithms are provided, each with a consistent interface, making it straightforward to train models and generate predictions.
+
+Comprehensive model evaluation: The package offers standardized performance metrics including accuracy, precision, recall, F1-score, and AUC-ROC, along with ROC curve visualization.
+
+Model comparison capabilities: Users can easily compare the performance of multiple models on the same dataset using the dedicated models_comparison() function.
+
+Modular design: All data processing, model training, prediction, and evaluation steps are organized into independent, well-documented functions, ensuring code clarity, reusability, and extensibility.
+
+Through the four example datasets (Breast Cancer, Diabetes, Heart Disease, and Mushroom), users can follow a complete classification workflow and adapt it to their own data. The package also incorporates unit testing to ensure reliability and robustness.
+
+In summary, ClassifyR serves as both a practical tool for data analysts and machine learning engineers and an educational resource for students learning classification techniques in R. Its consistent interface and modular structure lower the barrier to entry for machine learning workflows while maintaining the flexibility needed for real-world applications.
+
+For more information, please refer to the function documentation or explore the examples in this vignette.
