@@ -1,10 +1,10 @@
 ---
-title: "Guide For using ClassifyR Package"
+title: "ClassifyR Package Vignette"
 author: "Yibing Zhang, Zijin Li, Xinyi Hu"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Guide For using ClassifyR Package}
+  %\VignetteIndexEntry{ClassifyR Package Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -26,12 +26,13 @@ Our package is designed for binary classification problems. To demonstrate the c
 
 Target users
 
-- Students learning about machine learning classification algorithms
-- Researchers comparing multiple classification approaches on some dataset
+-   Students learning about machine learning classification algorithms
+-   Researchers comparing multiple classification approaches on some dataset
 
 # 2. Package Installation
 
 To install this package, please use the command below and then load the package
+
 ```{r install-pkg, eval = FALSE}
 install.packages("ClassifyR")
 ```
@@ -84,6 +85,7 @@ processed_data_visual(breast_cancer_data_res$train_data, target_col = "Status")
 # Diabetes Dataser
 processed_data_visual(diabetes_data_res$train_data, target_col = "Outcome")
 ```
+
 Then after our statistical analysis and some visualization, we are getting to know our data and now we are ready to use them to train our model. In the next part we make a table to guide you to choose the proper model that suits your valuable data set.
 
 # 4. Model Suitability for Different Training Sets
@@ -264,7 +266,8 @@ diabetes_rf_pred_prob <- diabetes_rf_result$pred_prob
 ```{r}
 evaluate_models(breast_cancer_data_res$y_test, bc_NN_prediction_res,"1")
 ```
-**Performance Analysis:** The single-model evaluation function `evaluate_models` provides a comprehensive view of the Neural Network's performance. The overall Accuracy and F1-Score are robust. The model achieved a high Area Under the Curve (AUC) and the heatmap (confusion matrix) reveals a large proportion of True Positives and True Negatives, indicating a strong ability to distinguish between classes. 
+
+**Performance Analysis:** The single-model evaluation function `evaluate_models` provides a comprehensive view of the Neural Network's performance. The overall Accuracy and F1-Score are robust. The model achieved a high Area Under the Curve (AUC) and the heatmap (confusion matrix) reveals a large proportion of True Positives and True Negatives, indicating a strong ability to distinguish between classes.
 
 ## 6-2. Mushroom dataset
 
@@ -284,6 +287,7 @@ mushroom_models_com = list(
 
 models_comparison(mushroom_data_res$y_test, mushroom_models_com, "1")
 ```
+
 **Performance Analysis and Comparison:** Because the Mushroom dataset relies heavily on categorical logic rules (e.g., odor, cap shape), both models perform well. While the standalone Decision Tree provides excellent interpretability, the Random Forest model mitigates the risk of overfitting by aggregating multiple trees. Consequently, the Random Forest output demonstrates higher stability and a near-perfect F1-Score, proving it to be the superior algorithm for this specific data structure.
 
 ## 6-3. Heart Disease dataset
@@ -298,6 +302,7 @@ heart_models_com = list(
   )
 models_comparison(heart_data_res$y_test, heart_models_com, "1")
 ```
+
 **Performance Analysis and Comparison:** Random forest strikes the best balance between classes in the confusion matrix and achieves the highest overall accuracy and AUC, demonstrating strong class separation. XGBoost excels at identifying actual positive cases, which is highly desirable in medical contexts to avoid missing sick patients. However, this high sensitivity comes at the expense of lower precision (more false positives). SVM delivers highly balanced and competitive results. It achieves the highest precision, meaning its positive predictions are the most reliable among all models. Decision Tree performs moderately well across all metrics. While its overall performance is slightly edged out by ensemble methods, it provides a transparent and easily interpretable baseline. Neural Network struggles on this dataset, lagging behind in all major metrics. This indicates that the current architecture or hyperparameters require further tuning to effectively capture the non-linear patterns here.
 
 ## 6-4. Diabetes Dataset
@@ -312,8 +317,8 @@ diabetes_models_com = list(
   )
 models_comparison(diabetes_data_res$y_test, diabetes_models_com, "1")
 ```
-**Performance Analysis and Comparison:** Overall, SVM and random Forest are best. SVM provides the most balanced performance across all core metrics. Random Forest minimizes false positives and making it highly reliable when predicting a positive diabetes case. XGBoost identifies a large majority of actual positive cases. If the medical priority is to minimize missed diagnoses, XGBoost is an excellent choice, despite generating more false positives. Decision Tree performs well and proves that simple, interpretable rule-based splits are quite effective for the clinical thresholds inherent in this noisy dataset. Neural Network fails on this dataset. Due to overly aggressive tuning, the model failed to converge and acts almost as a constant predictor. This inflates recall but completely destroys precision.
 
+**Performance Analysis and Comparison:** Overall, SVM and random Forest are best. SVM provides the most balanced performance across all core metrics. Random Forest minimizes false positives and making it highly reliable when predicting a positive diabetes case. XGBoost identifies a large majority of actual positive cases. If the medical priority is to minimize missed diagnoses, XGBoost is an excellent choice, despite generating more false positives. Decision Tree performs well and proves that simple, interpretable rule-based splits are quite effective for the clinical thresholds inherent in this noisy dataset. Neural Network fails on this dataset. Due to overly aggressive tuning, the model failed to converge and acts almost as a constant predictor. This inflates recall but completely destroys precision.
 
 # 7. The advantage of our package
 
@@ -351,17 +356,17 @@ The ClassifyR package provides a comprehensive and user-friendly framework for b
 
 Key features of the package include:
 
-* Streamlined data preprocessing: Functions for handling missing values, correlation analysis, train-test splitting, and Min-Max normalization ensure that datasets are properly prepared before model training.
+-   Streamlined data preprocessing: Functions for handling missing values, correlation analysis, train-test splitting, and Min-Max normalization ensure that datasets are properly prepared before model training.
 
-* Exploratory data analysis and visualization: Built-in functions enable users to understand data distributions and feature relationships through statistical summaries and publication-quality visualizations.
+-   Exploratory data analysis and visualization: Built-in functions enable users to understand data distributions and feature relationships through statistical summaries and publication-quality visualizations.
 
-* Multiple modeling approaches: Five distinct classification algorithms are provided, each with a consistent interface, making it straightforward to train models and generate predictions.
+-   Multiple modeling approaches: Five distinct classification algorithms are provided, each with a consistent interface, making it straightforward to train models and generate predictions.
 
-* Comprehensive model evaluation: The package offers standardized performance metrics including accuracy, precision, recall, F1-score, and AUC-ROC, along with ROC curve visualization.
+-   Comprehensive model evaluation: The package offers standardized performance metrics including accuracy, precision, recall, F1-score, and AUC-ROC, along with ROC curve visualization.
 
-* Model comparison capabilities: Users can easily compare the performance of multiple models on the same dataset using the dedicated models_comparison() function.
+-   Model comparison capabilities: Users can easily compare the performance of multiple models on the same dataset using the dedicated models_comparison() function.
 
-* Modular design: All data processing, model training, prediction, and evaluation steps are organized into independent, well-documented functions, ensuring code clarity, reusability, and extensibility.
+-   Modular design: All data processing, model training, prediction, and evaluation steps are organized into independent, well-documented functions, ensuring code clarity, reusability, and extensibility.
 
 Through the four example datasets (Breast Cancer, Diabetes, Heart Disease, and Mushroom), users can follow a complete classification workflow and adapt it to their own data. The package also incorporates unit testing to ensure reliability and robustness.
 
