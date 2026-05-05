@@ -93,6 +93,10 @@ plot(bc_model$cost_hist, type = "l",
      xlab = "Iteration", ylab = "Cost",
      main = "Training Loss",
      col="red")
+
+# we further use this model prediction result to evaluate this model
+bc_NN_prediction_res= NN_performance(test_data = breast_cancer_data_res$X_test,hidden_neurons = 15,model_name = "Neural Network",train_model = bc_model)
+
 ```
 
 For Mushroom data set, we use
@@ -105,8 +109,8 @@ mushroom_rf_model <- train_rf(
   max_depth = 5
 )
 mushroom_rf_result <- predict_rf_model(mushroom_rf_model, mushroom_data_res$X_test_norm)
-mushroom_rf_predictions <- mushroom_rf_result$predictions
-mushroom_rf_pred_prob   <- mushroom_rf_result$pred_prob
+# mushroom_rf_predictions <- mushroom_rf_result$predictions
+# mushroom_rf_pred_prob   <- mushroom_rf_result$pred_prob
 
 mushroom_dt_model = decision_tree(mushroom_data_res$X_train_norm, mushroom_data_res$y_train, mushroom_data_res$X_test_norm, mushroom_data_res$y_test, cp = 0.01)
 ```
@@ -121,6 +125,22 @@ heart_xgb_result <- train_xgb(
   y_test  = heart_data_res$y_test
 )
 
+heart_svm_result <- train_svm(
+  X_train = heart_data_res$X_train,
+  y_train = heart_data_res$y_train,
+  X_test  = heart_data_res$X_test,
+  y_test  = heart_data_res$y_test,
+  tune = TRUE
+)
+
+heart_rf_model <- train_rf(
+  X = heart_data_res$X_train_norm,
+  y = heart_data_res$y_train,
+  n_trees = 20,
+  max_depth = 5
+)
+
+heart_rf_result <- predict_rf_model(heart_rf_model, heart_data_res$X_test_norm)
 ```
 
 For Diabetes data set, we use
@@ -147,11 +167,10 @@ diabetes_rf_model <- train_rf(
   n_trees = 20,
   max_depth = 5
 )
+
 diabetes_rf_result <- predict_rf_model(diabetes_rf_model, diabetes_data_res$X_test_norm)
 diabetes_rf_predictions <- diabetes_rf_result$predictions
 diabetes_rf_pred_prob <- diabetes_rf_result$pred_prob
-
-
 ```
 
 ## Model Evaluation and Result Analysis
@@ -159,15 +178,61 @@ diabetes_rf_pred_prob <- diabetes_rf_result$pred_prob
 For the breast cancer data set
 
 ```{r}
-evaluate_models(mushroom_data_res$y_test, mushroom_dt_model, "1")
-# 可以调用NN_performance
+evaluate_models(breast_cancer_data_res$y_test,bc_NN_prediction_res,"1")
+# 这里是不是可以加一些对于数据的分析
 ```
+
+For Mushroom data set
 
 ```{r}
-# mushroom_models = list(mushroom_dt_model, )
-# models_comparison(mushroom_data_res$y_test, mushroom_models, "1")
+evaluate_models(mushroom_data_res$y_test, mushroom_rf_result,"1")
+evaluate_models(mushroom_data_res$y_test, mushroom_dt_model, "1")
 ```
 
+Since we use 2 different models for the mushroom prediction, we can use the function below to compare these 2 models
+```{r}
+mushroom_models_com = list(
+  "Decision Tree" = list(predictions = mushroom_dt_model$predictions,
+                         pred_prob=mushroom_dt_model$pred_prob),
+  "Random Forest" = list(predictions=mushroom_rf_result$predictions,
+                         pred_prob = mushroom_rf_result$pred_prob))
+
+models_comparison(mushroom_data_res$y_test, mushroom_models_com, "1")
+```
+For the heart disease model:
+```{r}
+evaluate_models(heart_data_res$y_test,heart_svm_result,"1")
+evaluate_models(heart_data_res$y_test,heart_rf_result,"1")
+evaluate_models(heart_data_res$y_test,heart_xgb_result,"1")
+
+heart_models_com = list(
+  "XGBoost" = list(predictions = heart_xgb_result$predictions,
+                         pred_prob=heart_xgb_result$pred_prob),
+  "Random Forest" = list(predictions=heart_rf_result$predictions,
+                         pred_prob = heart_rf_result$pred_prob),
+  "SVM Result" = list(predictions=heart_svm_result$predictions,
+                      pred_prob = heart_svm_result$pred_prob))
+models_comparison(heart_data_res$y_test, heart_models_com, "1")
+```
+For the diabetes models:
+```{r}
+evaluate_models(diabetes_data_res$y_test,diabetes_svm_result,"1")
+evaluate_models(diabetes_data_res$y_test,diabetes_rf_result,"1")
+evaluate_models(diabetes_data_res$y_test,diabetes_xgb_result,"1")
+
+diabetes_models_com = list(
+  "XGBoost" = list(predictions = diabetes_xgb_result$predictions,
+                         pred_prob=diabetes_xgb_result$pred_prob),
+  "Random Forest" = list(predictions=diabetes_rf_result$predictions,
+                         pred_prob = diabetes_rf_result$pred_prob),
+  "SVM Result" = list(predictions=diabetes_svm_result$predictions,
+                      pred_prob = diabetes_svm_result$pred_prob))
+models_comparison(diabetes_data_res$y_test, diabetes_models_com, "1")
+```
+
+
+
+>>>>>>> 8e8f7f8b6abd56875d973a6e3d84a13e0dba7679
 ## The advantage of our package:
 
 1.  It demonstrates the complete pipeline for binary classification, including data preparation, data cleaning, exploratory data analysis, model training, prediction making, model comparison, and data/model visualization.
